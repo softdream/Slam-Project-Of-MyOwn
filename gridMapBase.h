@@ -12,6 +12,7 @@ class GridMapBase
 {
 public:
 	GridMapBase();
+	GridMapBase( const MapInfo &mapInfoCpy );
 	GridMapBase( int sizeX, int sizeY, float cellLength );
 	~GridMapBase();
 	
@@ -45,6 +46,17 @@ public:
 
 	size_t getCellsNumber() const;
 
+	void setCellOccupied( int index ) const;
+	void setCellOccupied( int mapX, int mapY ) const;
+	void setCellFree( int index ) const;
+	void setCellFree( int mapX, int mapY ) const;
+
+	float getCellOccupiedProbability( int index ) const;
+	float getCellOccupiedProbability( int mapX, int mapY ) const;
+
+	void setLogOddsPoccValue( float Pocc );
+	void setLogOddsPfreeValue( float Pfree );
+
 protected:
 	void allocateMapArray();
 	void deleteMapArray();
@@ -67,6 +79,13 @@ GridMapBase<CellType, CellOperations>::GridMapBase()
 {
 	allocateMapArray();
 }
+
+template<typename CellType, typename CellOperations>
+GridMapBase<CellType, CellOperations>::GridMapBase( const MapInfo &mapInfoCpy ): mapInfo( mapInfoCpy )
+{
+        allocateMapArray();
+}
+
 
 template<typename CellType, typename CellOperations>
 GridMapBase<CellType, CellOperations>::GridMapBase( int sizeX, int sizeY, float cellLength ) : mapInfo( sizeX, sizeY, cellLength )
@@ -253,14 +272,53 @@ size_t GridMapBase<CellType, CellOperations>::getCellsNumber() const
 	return mapArray.size();
 }
 
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setCellOccupied( int index ) const
+{
+	return cellOperate.setCellOccupied( this->getCell( index ) );
+}
 
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setCellOccupied( int mapX, int mapY ) const
+{
+	return cellOperate.setCellOccupied( this->getCell( mapX, mapY ) );
+}
 
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setCellFree( int index ) const
+{
+	return cellOperate.setCellFree( this->getCell( index ) );
+}
 
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setCellFree( int mapX, int mapY ) const
+{
+	return cellOperate.setCellFree(  this->getCell( mapX, mapY ));
+}	
 
+template<typename CellType, typename CellOperations>
+float GridMapBase<CellType, CellOperations>::getCellOccupiedProbability( int index ) const
+{
+	return cellOperate.getCellProbability( this->getCell( index ) );
+}
 
+template<typename CellType, typename CellOperations>
+float GridMapBase<CellType, CellOperations>::getCellOccupiedProbability( int mapX, int mapY ) const
+{
+	return cellOperate.getCellProbability( this->getCell( mapX, mapY ) );
+}
 
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setLogOddsPoccValue( float Pocc )
+{
+	return cellOperate.setLogOddsPocc( Pocc );
+}
 
-
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setLogOddsPfreeValue( float Pfree )
+{
+	return cellOperate.setCellOccupied( Pfree );
+}
 
 
 }
