@@ -1,0 +1,269 @@
+#ifndef __GRID_MAP_BASE_H_
+#define __GRID_MAP_BASE_H_
+
+#include "mapInfo.h"
+#include <vector>
+#include <iostream>
+
+namespace slam {
+
+template<typename CellType, typename CellOperations>
+class GridMapBase
+{
+public:
+	GridMapBase();
+	GridMapBase( int sizeX, int sizeY, float cellLength );
+	~GridMapBase();
+	
+	void setMapInfo( int sizeX, int sizeY, int cellLength );	
+	void setMapInfo( const MapInfo &newMapInfo );
+
+	MapInfo getMapInfo() const;
+        int getSizeX() const;
+        int getSizeY() const;
+
+	Eigen::Vector2i getMapCenter() const;
+        float getCellLength() const;
+        float getScale() const;	
+
+	CellType &getCell( int x, int y );
+	const CellType &getCell( int x, int y ) const;
+	
+	CellType &getCell( int index );
+	const CellType &getCell( int index ) const;
+
+	Eigen::Vector2f observedPointPoseWorld2Map( Eigen::Vector2f &poseInWorld ) const;
+	Eigen::Vector2f observedPointPoseMap2World( Eigen::Vector2f &poseInMap ) const;
+	
+	Eigen::Vector3f robotPoseWorld2Map( Eigen::Vector3f &poseInWorld ) const;
+	Eigen::Vector3f robotPoseMap2World( Eigen::Vector3f &poseInMap ) const;
+
+	bool isPointOutOfRange( float x, float y ) const;
+	bool isPointOutOfRange( const Eigen::Vector2f point ) const;
+
+	void printMapInfo() const;	
+
+	size_t getCellsNumber() const;
+
+protected:
+	void allocateMapArray();
+	void deleteMapArray();
+
+	void resizeMap();
+	
+	void clear();	
+
+protected:
+	std::vector<CellType> mapArray;
+	
+	CellOperations cellOperate;
+	
+	MapInfo mapInfo;
+};
+
+
+template<typename CellType, typename CellOperations>
+GridMapBase<CellType, CellOperations>::GridMapBase()
+{
+	allocateMapArray();
+}
+
+template<typename CellType, typename CellOperations>
+GridMapBase<CellType, CellOperations>::GridMapBase( int sizeX, int sizeY, float cellLength ) : mapInfo( sizeX, sizeY, cellLength )
+{
+        allocateMapArray();
+}
+
+template<typename CellType, typename CellOperations>
+GridMapBase<CellType, CellOperations>::~GridMapBase()
+{
+
+}
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setMapInfo( int sizeX, int sizeY, int cellLength )
+{
+	return mapInfo.setMapInfo( sizeX, sizeY, cellLength );
+}
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setMapInfo( const MapInfo &newMapInfo )
+{
+	return mapInfo.setMapInfo( newMapInfo );
+}
+
+template<typename CellType, typename CellOperations>
+MapInfo GridMapBase<CellType, CellOperations>::getMapInfo() const
+{
+	return mapInfo.getMapInfo();
+}
+
+template<typename CellType, typename CellOperations>
+int GridMapBase<CellType, CellOperations>::getSizeX() const
+{
+	return mapInfo.getSizeX();
+}
+
+template<typename CellType, typename CellOperations>
+int GridMapBase<CellType, CellOperations>::getSizeY() const
+{
+	return mapInfo.getSizeY();
+}
+
+template<typename CellType, typename CellOperations>
+Eigen::Vector2i GridMapBase<CellType, CellOperations>::getMapCenter() const
+{
+	return mapInfo.getMapCenter();
+}
+
+template<typename CellType, typename CellOperations>
+float GridMapBase<CellType, CellOperations>::getCellLength() const
+{
+	return mapInfo.getCellLength();
+}
+
+template<typename CellType, typename CellOperations>
+float GridMapBase<CellType, CellOperations>::getScale() const
+{
+	return mapInfo.getScale();
+}
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::allocateMapArray()
+{
+	int size = getSizeX() * getSizeY();
+	
+	mapArray.resize( size );
+	
+	if( mapArray.size() != size ){
+		std::cerr<<"allocate the memory for the map failed ..."<<std::endl;
+                exit(-1);
+	}
+	std::cerr<<"allocate the memory for the map ..."<<std::endl;
+	
+}
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::deleteMapArray()
+{
+	if( mapArray.empty() ){
+		mapArray.clear();
+		
+		std::vector<CellType>().swap( mapArray );
+		
+		std::cerr<<"delete the memory for the map Array ..."<<std::endl;
+	}
+}
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::clear()
+{
+	mapArray.clear();
+}
+
+template<typename CellType, typename CellOperations>
+CellType& GridMapBase<CellType, CellOperations>::getCell( int x, int y )
+{
+	return mapArray[ (y - 1) * this->getSizeX() + ( x - 1 ) ];
+}
+
+template<typename CellType, typename CellOperations>
+const CellType& GridMapBase<CellType, CellOperations>::getCell( int x, int y ) const
+{
+	return mapArray[ (y - 1) * this->getSizeX() + ( x - 1 ) ];
+}
+
+template<typename CellType, typename CellOperations>
+CellType& GridMapBase<CellType, CellOperations>::getCell( int index )
+{
+	return mapArray[ index ];
+}
+
+template<typename CellType, typename CellOperations>
+const CellType& GridMapBase<CellType, CellOperations>::getCell( int index ) const
+{
+	return mapArray[ index ];
+}
+
+
+template<typename CellType, typename CellOperations>
+Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseWorld2Map( Eigen::Vector2f &poseInWorld ) const
+{
+	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );
+
+	return poseInWorld * this->getScale() + temp;
+}
+
+template<typename CellType, typename CellOperations>
+Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseMap2World( Eigen::Vector2f &poseInMap ) const
+{
+	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );
+
+	return ( poseInMap - temp ) * this->getCellLength();
+}
+
+template<typename CellType, typename CellOperations>
+Eigen::Vector3f GridMapBase<CellType, CellOperations>::robotPoseWorld2Map( Eigen::Vector3f &poseInWorld ) const
+{
+	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );	
+
+	Eigen::Vector2f mapCoords( poseInWorld.head<2>() * this->getScale() + temp );
+	
+	return Eigen::Vector3f( mapCoords[0], mapCoords[1], poseInWorld[2] );
+}
+
+template<typename CellType, typename CellOperations>
+Eigen::Vector3f GridMapBase<CellType, CellOperations>::robotPoseMap2World( Eigen::Vector3f &poseInMap ) const
+{
+	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );	
+
+	Eigen::Vector2f worldCoords( ( poseInMap.head<2>() - temp ) * this->getCellLength() );
+
+	return Eigen::Vector3f( worldCoords[0], worldCoords[1], poseInMap[2] );
+}
+
+template<typename CellType, typename CellOperations>
+bool GridMapBase<CellType, CellOperations>::isPointOutOfRange(float x, float y) const
+{
+	return ( x < 0.0f || y < 0.0f || x > static_cast<float>( this->getSizeX() ) || y > static_cast<float>( this->getSizeY() ) );
+}
+
+template<typename CellType, typename CellOperations>
+bool GridMapBase<CellType, CellOperations>::isPointOutOfRange( const Eigen::Vector2f point ) const
+{
+	return ( point[0] < 0.0f || point[1] < 0.0f || point[0] > static_cast<float>( this->getSizeX() ) || point[1] > static_cast<float>( this->getSizeY() ) );
+}
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::printMapInfo() const
+{
+	std::cout<<"---------- Map Information ----------"<<std::endl;
+        std::cout<<"Map Size X: "<<this->getSizeX()<<std::endl;
+        std::cout<<"Map Size Y: "<<this->getSizeY()<<std::endl;
+        std::cout<<"Map Cell Length: "<<this->getCellLength()<<std::endl;
+        std::cout<<"Map Center: ( "<<this->getMapCenter()[0]<<", "<<this->getMapCenter()[1]<<" )"<<std::endl;
+        std::cout<<"Map Scale: "<<this->getScale()<<std::endl;
+
+	std::cout<<"Cells Number: "<<this->getCellsNumber()<<std::endl;
+}
+
+template<typename CellType, typename CellOperations>
+size_t GridMapBase<CellType, CellOperations>::getCellsNumber() const
+{
+	return mapArray.size();
+}
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+#endif
