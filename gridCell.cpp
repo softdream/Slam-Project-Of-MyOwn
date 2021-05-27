@@ -2,10 +2,16 @@
 
 namespace slam {
 
-GridCell::GridCell() : logOddsValue(0.0f)
+GridCell::GridCell() : logOddsValue(0.0f), updateIndex( 0 )
 {
 
 }
+
+GridCell::GridCell( float logOddsValue_, int updateIndex_ ) : logOddsValue(logOddsValue_), updateIndex( updateIndex_ )
+{
+
+}
+
 
 GridCell::~GridCell()
 {
@@ -40,6 +46,7 @@ bool GridCell::isUnknow() const
 void GridCell::resetGridCell()
 {
 	logOddsValue = 0.0f;
+	updateIndex = 0;
 }
 
 }

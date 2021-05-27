@@ -8,7 +8,8 @@ class GridCell
 public:
 	GridCell();
 	~GridCell();
-
+	GridCell( float logOddsValue_, int updateIndex_ );
+	
 	void setLogOddsValue( float logOddsValue );
 
 	float getLogOddsValue() const;
@@ -21,7 +22,7 @@ public:
 
 public:
 	float logOddsValue;
-
+	int updateIndex;
 };
 
 }

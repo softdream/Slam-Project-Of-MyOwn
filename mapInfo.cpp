@@ -3,8 +3,8 @@
 
 namespace slam {
 
-MapInfo::MapInfo(): sizeX( 1000 ),
-		    sizeY( 1000 ),
+MapInfo::MapInfo(): sizeX( 1001 ),
+		    sizeY( 1001 ),
 		    mapCenter( 500, 500 ),
 		    cellLength( 0.1f ),
 		    scale( 10.0f )
@@ -13,7 +13,7 @@ MapInfo::MapInfo(): sizeX( 1000 ),
 }
 
 MapInfo::MapInfo( int sizeX_, int sizeY_, float cellLength_ ):sizeX( sizeX_ ),
-							      sizeY( sizeY_ ),
+							      sizeY( sizeY_  ),
 							     cellLength( cellLength_ )
 {
 	mapCenter = Eigen::Vector2i( static_cast<int>( ::floor( sizeX / 2.0f ) ), static_cast<int>( ::floor( sizeY / 2.0f ) ) );
