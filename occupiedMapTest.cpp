@@ -14,7 +14,7 @@ int main()
 	std::cout<<"center: ( "<<occumap.getMapCenter()[0]<<", "<<occumap.getMapCenter()[1]<<" )"<<std::endl;
 	cv::circle(image, center, 3, cv::Scalar(0, 0, 255), 3);
 
-	occumap.updateByScan_test( );
+	//occumap.updateByScan_test( );
 	
 	/*for( int i = 0; i <  10;  i ++ ){
 		for( int j = 0; j < 10; j ++ ){

@@ -5,6 +5,8 @@
 #include "mapInfo.h"
 #include <cmath>
 
+#include "scanContainer.h"
+
 namespace slam {
 
 template<typename MapBaseType>
@@ -17,10 +19,13 @@ public:
 
 	~OccupiedGridMap();
 
+	Eigen::Vector2f observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld );
+	Eigen::Vector2f observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld );
+
 	void inverseModel( int x0, int y0, int x1, int y1 );
 	void inverseModel( Eigen::Vector2i &p0, Eigen::Vector2i &p1 );
 	
-	void updateByScan_test(  );
+	void updateByScan_test( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld );
 	
 
 private:
@@ -190,11 +195,36 @@ void OccupiedGridMap<MapBaseType>::bresenhamCellOccupied( int mapX, int mapY )
 }
 
 template<typename MapBaseType>
-void OccupiedGridMap<MapBaseType>::updateByScan_test(  )
+Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld )
+{
+	//Eigen::Vector2f poseInWorld_temp( ( ::cos( robotPoseInWorld[2] ) * poseInLaser[0] - ::sin( robotPoseInWorld[2] ) * poseInLaser[1] ), ( ::sin( robotPoseInWorld[2] ) * poseInLaser[0] + ::cos( robotPoseInWorld[2] ) * poseInLaser[1] ) );
+
+	//return poseInWorld_temp + robotPoseInWorld.head<2>();	
+
+	Eigen::Matrix2f rotateMat;
+	rotateMat << ::cos( robotPoseInWorld[2] ), -(::sin( robotPoseInWorld[2] )),
+			::sin( robotPoseInWorld[2] ), ::cos( robotPoseInWorld[2] );
+
+	return rotateMat * poseInLaser + robotPoseInWorld.head<2>();
+}
+
+template<typename MapBaseType>
+Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld )
+{
+	Eigen::Matrix2f rotateMat;
+        rotateMat << ::cos( robotPoseInWorld[2] ), -(::sin( robotPoseInWorld[2] )),
+                        ::sin( robotPoseInWorld[2] ), ::cos( robotPoseInWorld[2] );
+
+	return rotateMat.inverse() * poseInWorld - robotPoseInWorld.head<2>();
+}
+
+
+template<typename MapBaseType>
+void OccupiedGridMap<MapBaseType>::updateByScan_test( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld )
 {
 	currUpdateIndex ++;
 	
-	inverseModel( 500, 500, 850, 910 );
+	
 }
 
 
