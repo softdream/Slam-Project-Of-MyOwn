@@ -20,6 +20,8 @@ public:
 
 	template<typename LaserData>
 	void pointTransform2LaserCoords( const LaserData &scan );	
+	
+	int getSize() const;
 
 private:
 	std::vector<DataType> dataVec;
@@ -37,6 +39,13 @@ DataContainer<DataType>::~DataContainer()
 {
 
 }
+
+template<typename DataType>
+int DataContainer<DataType>::getSize() const
+{
+	return dataVec.size();
+}
+
 
 template<typename DataType>
 void DataContainer<DataType>::addData( const DataType &data )
