@@ -1,8 +1,12 @@
 #include "scanMatch.h"
+#include "utils.h"
 
 namespace slam {
 
-ScanMatchMethod::ScanMatchMethod()
+ScanMatchMethod::ScanMatchMethod() : mP00( 0 ), 
+				     mP11( 0 ),
+				     mP01( 0 ),
+				     mP10(0)
 {
 
 }
@@ -102,13 +106,150 @@ Eigen::Vector3f ScanMatchMethod::bilinearInterpolationWithDerivative( const Occu
 }
 
 
-void ScanMatchMethod::getHessianDerivative( const Eigen::Vector3f robotPoseInMap, 
-                                   const ScanContainer &scanPoints, 
-                                   Eigen::Matrix3f &H,  
-                                   Eigen::Vector3f &dTr )
+void ScanMatchMethod::getHessianDerivative( const OccupiedMap &occuMap,
+					    Eigen::Vector3f &robotPoseInWorld,
+                                   	    const ScanContainer &scanPoints, 
+                                   	    Eigen::Matrix3f &H,  
+                                   	    Eigen::Vector3f &dTr )
 {
+	int size = scanPoints.getSize();
+
+	float sinRot = ::sin( robotPoseInWorld[2] );
+	float cosRot = ::cos( robotPoseInWorld[2] );
+
+	H = Eigen::Matrix3f::Zero();
+	dTr = Eigen::Vector3f::Zero();	
+
+	for( int i = 0; i < size; i ++ ){
+		// 1. get the current point in laser coordinate
+		Eigen::Vector2f currPointInLaser( scanPoints.getIndexData( i ) );
+		Eigen::Vector2f currPointInScaleLaser( scanPoints.getIndexData( i ) * occuMap.getScale() );	
+	
+		// 2. Transform the End Point from Laser Coordinate to World Coordinate
+		Eigen::Vector2f currPointInWorld( occuMap.observedPointPoseLaser2World( currPointInLaser, robotPoseInWorld ) );
+		
+		// 3. Transform the End Point from World Coordinate to Map Coordinate
+		Eigen::Vector2f currPointInMap( occuMap.observedPointPoseWorld2Map( currPointInWorld ) );
+
+		// 4. get the M(Pm), d(M(Pm))/dx, d(M(Pm))/dy
+		Eigen::Vector3f interpolatedValue( bilinearInterpolationWithDerivative( occuMap, currPointInMap ) );
+		
+		// 5. the Objective Function: f(x) = 1 - M(Pm)
+		float funcValue = 1.0f - interpolatedValue[0];
+	
+		// 6. 
+		dTr[0] += interpolatedValue[1] * funcValue;
+		dTr[1] += interpolatedValue[2] * funcValue;
+
+		// 7. 
+		float rotDeriv = ( interpolatedValue[1] * ( -sinRot * currPointInScaleLaser[0] - cosRot * currPointInScaleLaser[1] ) ) + ( interpolatedValue[2] * ( cosRot * currPointInScaleLaser[0] - sinRot * currPointInScaleLaser[1] ) );
+
+		// 8. 
+		dTr[2] += rotDeriv * funcValue;
+
+		// 9. 
+		H( 0, 0 ) += sqr( interpolatedValue[1] );
+		H( 1, 1 ) += sqr( interpolatedValue[2] );
+		H( 2, 2 ) += sqr( rotDeriv );
+
+		H( 0, 1 ) += interpolatedValue[1] * interpolatedValue[2];
+		H( 0, 2 ) += interpolatedValue[1] * rotDeriv;
+		H( 1, 2 ) += interpolatedValue[2] * rotDeriv;
+
+	}
+
+	// 10. 
+	H( 1, 0 ) = H( 0, 1 );
+	H( 2, 0 ) = H( 0, 2 );
+	H( 2, 1 ) = H( 1, 2 );
+}
+
+bool ScanMatchMethod::estimateTransformationOnce( const OccupiedMap &occuMap, 
+                                 Eigen::Vector3f &estimateInWorld,  
+                                 const ScanContainer &scanPoints )
+{
+	getHessianDerivative( occuMap, estimateInWorld, scanPoints, H, dTr );
+	std::cout<<"Hessian : "<<std::endl;
+	std::cout<<H<<std::endl;
+	std::cout<<"dTr: "<<std::endl;
+	std::cout<<dTr<<std::endl;;
+
+	if ( ( H(0, 0) != 0.0f ) && ( H(1, 1) != 0.0f ) ){
+		Eigen::Vector3f deltaCauchy( H.inverse() * dTr );
+		
+		if( deltaCauchy[2] > 0.2f ){
+			deltaCauchy[2] = 0.2f;
+			std::cout<<"delta Cauchy angle change too large"<<std::endl;
+		}
+		else if( deltaCauchy[2] < -0.2f ){
+			deltaCauchy[2] = -0.2f;
+			std::cout<<"delta Cauchy angle change too small"<<std::endl;
+		}
+	
+		updateEstimatedPose( occuMap, estimateInWorld, deltaCauchy );
+		
+		return true;
+	}
+	
+	return false;
+	
+}
+
+void ScanMatchMethod::updateEstimatedPose( const OccupiedMap &occuMap, Eigen::Vector3f &estimateInWorld, Eigen::Vector3f &delta )
+{
+	Eigen::Vector3f estimateInMap( occuMap.robotPoseWorld2Map( estimateInWorld ) );
+
+	estimateInMap += delta;
+	
+	estimateInWorld = occuMap.robotPoseMap2World( estimateInMap );
+}
+
+Eigen::Vector3f ScanMatchMethod::scanToMap( const OccupiedMap &occuMap, 
+                        Eigen::Vector3f &beginEstimatedPoseInWorld, 
+                        const ScanContainer &scanPoints, 
+                        Eigen::Matrix3f &covarinceMatrix, 
+                        int maxInterations )
+{	
+	Eigen::Vector3f estimatePose( beginEstimatedPoseInWorld );
+
+	if( scanPoints.getSize() == 0 ){
+		return beginEstimatedPoseInWorld;
+	}		
+	
+	// 1. first 
+	estimateTransformationOnce( occuMap, estimatePose, scanPoints );
+	
+	// 2. 
+	for( int i = 0; i < maxInterations - 1; i ++ ){
+		estimateTransformationOnce( occuMap, estimatePose, scanPoints );
+			
+	}
+	
+	estimatePose[2] = normalize_angle( estimatePose[2] );
+
+	covarinceMatrix = Eigen::Matrix3f::Zero();
+
+	covarinceMatrix = H;
+	
+	return estimatePose;
+}
+
+
+
 
 }
 
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+

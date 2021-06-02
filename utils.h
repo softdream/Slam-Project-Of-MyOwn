@@ -35,4 +35,9 @@ static T toRad(const T degVal)
 
 }
 
+static inline float sqr(float val)
+{
+  return val*val;
+}
+
 #endif

@@ -21,8 +21,8 @@ public:
 
 	~OccupiedGridMap();
 
-	Eigen::Vector2f observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld );
-	Eigen::Vector2f observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld );
+	Eigen::Vector2f observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld ) const;
+	Eigen::Vector2f observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld ) const;
 
 	void inverseModel( int x0, int y0, int x1, int y1 );
 	void inverseModel( Eigen::Vector2i &p0, Eigen::Vector2i &p1 );
@@ -198,7 +198,7 @@ void OccupiedGridMap<MapBaseType>::bresenhamCellOccupied( int mapX, int mapY )
 }
 
 template<typename MapBaseType>
-Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld )
+Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld ) const
 {
 	//Eigen::Vector2f poseInWorld_temp( ( ::cos( robotPoseInWorld[2] ) * poseInLaser[0] - ::sin( robotPoseInWorld[2] ) * poseInLaser[1] ), ( ::sin( robotPoseInWorld[2] ) * poseInLaser[0] + ::cos( robotPoseInWorld[2] ) * poseInLaser[1] ) );
 
@@ -212,7 +212,7 @@ Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseLaser2World( Eige
 }
 
 template<typename MapBaseType>
-Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld )
+Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld ) const
 {
 	Eigen::Matrix2f rotateMat;
         rotateMat << ::cos( robotPoseInWorld[2] ), -(::sin( robotPoseInWorld[2] )),
