@@ -337,7 +337,7 @@ void GridMapBase<CellType, CellOperations>::setLogOddsPoccValue( float Pocc )
 template<typename CellType, typename CellOperations>
 void GridMapBase<CellType, CellOperations>::setLogOddsPfreeValue( float Pfree )
 {
-	return cellOperate.setCellOccupied( Pfree );
+	return cellOperate.setLogOddsPfree( Pfree );
 }
 
 template<typename CellType, typename CellOperations>

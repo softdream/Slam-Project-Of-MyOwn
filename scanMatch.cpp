@@ -216,21 +216,24 @@ Eigen::Vector3f ScanMatchMethod::scanToMap( const OccupiedMap &occuMap,
 		return beginEstimatedPoseInWorld;
 	}		
 	
-	// 1. first 
+	// 1. first iteration
 	estimateTransformationOnce( occuMap, estimatePose, scanPoints );
 	
-	// 2. 
+	// 2. multiple iterations
 	for( int i = 0; i < maxInterations - 1; i ++ ){
 		estimateTransformationOnce( occuMap, estimatePose, scanPoints );
 			
 	}
 	
+	// 3. normalize the angle [-PI ~ PI]
 	estimatePose[2] = normalize_angle( estimatePose[2] );
 
+	// 4. get the covariance matrix
 	covarinceMatrix = Eigen::Matrix3f::Zero();
 
 	covarinceMatrix = H;
 	
+	// 5. return the estimated pose in world coordinate
 	return estimatePose;
 }
 
