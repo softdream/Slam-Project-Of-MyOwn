@@ -29,6 +29,7 @@ public:
 	
 	void updateByScan_test( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld );
 	
+	void updateByScan( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld );
 
 private:
 	void bresenHam( int x0, int y0, int x1, int y1 );
@@ -262,6 +263,48 @@ void OccupiedGridMap<MapBaseType>::updateByScan_test( ScanContainer &points, Eig
 	}
 	
 }
+
+template<typename MapBaseType>
+void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld )
+{
+        currUpdateIndex ++;
+
+        // 1. Transform robot Pose In world Coordinate to Map Coordinate
+        Eigen::Vector3f robotPoseInMap = this->robotPoseWorld2Map( robotPoseInWorld );
+        std::cout<<"Robot Pose In Map Coordinate: "<<std::endl;
+        std::cout<<robotPoseInMap<<std::endl;
+
+        // 2. Get the start point of the laser data in Map Coordinate
+        Eigen::Vector2i scanBeginMapI( robotPoseInMap.head<2>().cast<int>() );
+        std::cout<<"Robot Pose In Map Coordinate(Interger): "<<std::endl;
+        std::cout<<scanBeginMapI<<std::endl;
+
+        size_t numberOfBeams = points.getSize();
+        std::cout<<"Number Of Beams: "<<numberOfBeams<<std::endl;
+
+        for( size_t i = 0; i < numberOfBeams; i ++ ){
+                // 3. Get the End point of Every Laser Beam in Laser Coordinate
+                Eigen::Vector2f scanEndInLaser( points.getIndexData( i ) );
+                std::cout<<"Occupied Point In World ( "<<scanEndInLaser[0]<<", "<<scanEndInLaser[1]<<" )"<<std::endl;
+
+                // 4. Transform the End Point from Laser Coordinate to World Coordinate
+                Eigen::Vector2f scanEndInWorld( this->observedPointPoseLaser2World( scanEndInLaser, robotPoseInWorld ) );
+
+                // 5. Transform the End Point from World Coordinate to Map Coordinate
+                Eigen::Vector2f scanEndInMap( this->observedPointPoseWorld2Map( scanEndInWorld ) );
+
+                // 6. Convert float to interger
+                //Eigen::Vector2i scanEndInMapI( scanEndInMap.cast<int>() );
+                Eigen::Vector2i scanEndInMapI( static_cast<int>( ::round( scanEndInMap[0] ) ), static_cast<int>( ::round( scanEndInMap[1] ) ) );
+
+                // 7. execuate Inverse Model algorithm
+                if( scanEndInMapI != scanBeginMapI ){
+                        this->inverseModel( scanBeginMapI, scanEndInMapI );
+                }
+        }
+
+}
+
 
 
 }

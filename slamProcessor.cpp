@@ -17,6 +17,11 @@ SlamProcessor::SlamProcessor()
 		exit(-1);
 	}	
 	std::cerr<<"Construct Scan Match Method Successfully ..."<<std::endl;
+
+	// ------------- initialize some parameters --------------//
+	covarianceMatrix = Eigen::Matrix3f::Zero();
+	lastScanMatchPose = Eigen::Vector3f::Zero();
+	lastMapUpdatePose = Eigen::Vector3f::Zero();
 }
 
 SlamProcessor::~SlamProcessor()
@@ -46,6 +51,11 @@ SlamProcessor::SlamProcessor( int sizeX_, int sizeY_, float cellLength_ )
         }
         std::cerr<<"Construct Scan Match Method Successfully ..."<<std::endl;
 	
+	// ------------- initialize some parameters --------------//
+        covarianceMatrix = Eigen::Matrix3f::Zero();
+        lastScanMatchPose = Eigen::Vector3f::Zero();
+        lastMapUpdatePose = Eigen::Vector3f::Zero();
+
 }
 
 void SlamProcessor::setUpdateLogOddsPoccValue( float Pocc )
@@ -85,11 +95,16 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 	lastScanMatchPose = newPoseEstimated;
 	
 	// 2. Map Update
-	
+	if( poseDiffLargerThan( lastMapUpdatePose, newPoseEstimated ) ){
+		// update the map only when the pose change is greater than the threshol
+		occupiedGridMap->updateByScan( scanContainer, newPoseEstimated );
+		// occupiedGridMap->onMapUpdate();
+		lastMapUpdatePose = newPoseEstimated;
+	}
 	
 }
 
-bool SlamProcessor::poseDiffLarberThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew )
+bool SlamProcessor::poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew )
 {
 	if( ( ( poseNew.head<2>() - poseOld.head<2>() ).norm() ) > minDistanceDiffForMapUpdate ){
 		return true;

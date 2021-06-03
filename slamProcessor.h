@@ -25,7 +25,7 @@ public:
 		     bool mapWithoutMatching = false );
 
 private:
-	bool poseDiffLarberThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
+	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 
 private:
 
