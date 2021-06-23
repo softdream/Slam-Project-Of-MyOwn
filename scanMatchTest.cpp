@@ -8,6 +8,7 @@
 #include "utils.h"
 #include <opencv2/opencv.hpp>
 
+#include "dataType.h"
 
 void laserData2Container( const slam::simulation::Laser &scan, slam::ScanContainer &container )
 {
