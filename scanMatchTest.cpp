@@ -69,7 +69,7 @@ int main()
         cv::circle(image, center, 3, cv::Scalar(0, 0, 255), 3);
 	cv::imshow( "test", image );
 	
-	/*
+	
 	//---------------- Input the first scan to initialize the map ----------------//
 	slam::ScanContainer laserPoints;
 	slam::simulation::readLaserTXT( scanArray );
@@ -93,7 +93,7 @@ int main()
 	//------------ updated the map ------------//
 	occumap.updateByScan( laserPoints, newRobotPose );	
 	displayAFrame( image, occumap );
-	*/
+	
 
 	cv::waitKey(0);		
 
