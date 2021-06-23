@@ -18,12 +18,17 @@ void laserData2Container( const slam::simulation::Laser &scan, slam::ScanContain
 		
 	for( int i = 0; i < 360; i ++ ){
 		float dist = scan.range[i];
-		Eigen::Vector2f point(::cos(theta) * dist, ::sin(theta) * dist);
-		std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
-		container.addData(point);
+
+		if( dist > 0.1f && dist < 10.0f ){
+			Eigen::Vector2f point(::cos(theta) * dist, ::sin(theta) * dist);
+			std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
+			container.addData(point);
+		}
 	
 		theta += std::fabs( 0.0174533f );
 	}
+	
+	std::cout<<"Scan Container Size: "<<container.getSize()<<std::endl;
 }
 
 void displayAFrame( cv::Mat &image, slam::OccupiedGridMap<slam::GridBase> &occumap )
@@ -68,7 +73,7 @@ int main()
         cv::Point2d center( occumap.getMapCenter()[0], occumap.getMapCenter()[1] );
         std::cout<<"center: ( "<<occumap.getMapCenter()[0]<<", "<<occumap.getMapCenter()[1]<<" )"<<std::endl;
         cv::circle(image, center, 3, cv::Scalar(0, 0, 255), 3);
-	cv::imshow( "test", image );
+	//cv::imshow( "test", image );
 	
 	
 	//---------------- Input the first scan to initialize the map ----------------//
@@ -92,8 +97,8 @@ int main()
 	std::cout<<newRobotPose<<std::endl;
 	
 	//------------ updated the map ------------//
-	occumap.updateByScan( laserPoints, newRobotPose );	
-	displayAFrame( image, occumap );
+	//occumap.updateByScan( laserPoints, newRobotPose );	
+//	displayAFrame( image, occumap );
 	
 
 	cv::waitKey(0);		
