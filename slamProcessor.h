@@ -2,6 +2,8 @@
 #define __SLAM_PROCESSOR_H_
 
 #include "scanMatch.h"
+#include "dataType.h"
+
 
 namespace slam {
 
@@ -24,8 +26,18 @@ public:
 		     ScanContainer &scanContainer,
 		     bool mapWithoutMatching = false );
 
+	// ---------- Get Map Information ---------//
+	MapInfo getMapInfo() const;	
+
+	// ---------- Process the first laser scan ------------//
+	void processTheFirstScan( Eigen::Vector3f &robotPoseInWorld,
+				  ScanContainer &scanContainer );
+	
+
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
+
+	void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container );
 
 private:
 

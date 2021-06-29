@@ -12,6 +12,10 @@ class GridMapBase
 {
 public:
 	GridMapBase();
+
+	GridMapBase( const GridMapBase &rhs );
+	const GridMapBase& operator=( const GridMapBase &rhs );	
+
 	GridMapBase( const MapInfo &mapInfoCpy );
 	GridMapBase( int sizeX, int sizeY, float cellLength );
 	~GridMapBase();
@@ -99,6 +103,29 @@ GridMapBase<CellType, CellOperations>::GridMapBase( int sizeX, int sizeY, float 
 {
         allocateMapArray();
 }
+
+template<typename CellType, typename CellOperations>
+GridMapBase<CellType, CellOperations>::GridMapBase( const GridMapBase &rhs ): mapInfo( rhs.mapInfo ),
+									      cellOperate( rhs.cellOperate ),
+									      mapArray( rhs.mapArray )
+{
+	
+}
+
+template<typename CellType, typename CellOperations>
+const GridMapBase<CellType, CellOperations>& GridMapBase<CellType, CellOperations>::operator=( const GridMapBase &rhs )
+{
+	if( &rhs == this ){
+		return *this;
+	}
+
+	mapInfo = rhs.mapInfo;
+	cellOperate = rhs.cellOperate;
+	mapArray = rhs.mapArray;
+		
+	return *this;
+}
+
 
 template<typename CellType, typename CellOperations>
 GridMapBase<CellType, CellOperations>::~GridMapBase()

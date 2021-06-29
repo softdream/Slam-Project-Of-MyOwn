@@ -83,7 +83,7 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 			    bool mapWithoutMatching )
 {
 	// 1. Pose Scan Match
-	Eigen::Vector3f newPoseEstimated;
+	Eigen::Vector3f newPoseEstimated;// estimated pose in world coordinate
 	
 	if( !mapWithoutMatching ){
 		newPoseEstimated = scanMatch->scanToMap( *occupiedGridMap, robotPoseInWorld, scanContainer, covarianceMatrix, 100 );
@@ -126,4 +126,68 @@ bool SlamProcessor::poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3
 	return false;
 }
 
+MapInfo SlamProcessor::getMapInfo() const
+{
+	return occupiedGridMap->getMapInfo();
 }
+
+void SlamProcessor::processTheFirstScan( Eigen::Vector3f &robotPoseInWorld, 
+                                  	 ScanContainer &scanContainer )
+{
+	// if it is the first laser scan, just update to initialize the map 
+	occupiedGridMap->updateByScan( scanContainer, robotPoseInWorld );
+}
+
+void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
+{
+	container.clear();
+
+	//float theta = -std::fabs(-3.12144 - 3.14159) / 360;
+	float theta = std::fabs( scan.angle_min );
+
+	for( int i = 0; i < scan.size(); ++ i ){
+		float dist = scan.ranges[ i ];
+
+		if( dist >= scan.range_min && dist <= scan.range_max ){
+			Eigen::Vector2f point( ::cos( theta ) * dist, ::sin( theta ) * dist );
+			//std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
+			
+			container.addData( point );
+		}
+		
+		theta += std::fabs( scan.angle_increment );
+	}
+	
+	// std::cout<<"Scan Container Size: "<<constainer.getSize()<<std::endl;
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

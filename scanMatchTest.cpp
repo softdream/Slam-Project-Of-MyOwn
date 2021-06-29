@@ -97,8 +97,8 @@ int main()
 	std::cout<<newRobotPose<<std::endl;
 	
 	//------------ updated the map ------------//
-	//occumap.updateByScan( laserPoints, newRobotPose );	
-//	displayAFrame( image, occumap );
+	occumap.updateByScan( laserPoints, newRobotPose );	
+	//displayAFrame( image, occumap );
 	
 
 	cv::waitKey(0);		

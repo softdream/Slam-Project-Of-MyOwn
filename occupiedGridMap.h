@@ -16,6 +16,10 @@ class OccupiedGridMap : public MapBaseType
 {
 public:
 	OccupiedGridMap();
+	
+	OccupiedGridMap( const OccupiedGridMap &rhs );
+	OccupiedGridMap& operator=( const OccupiedGridMap &rhs );
+
 	OccupiedGridMap( int sizeX_, int sizeY, float cellLength_ );	
 	OccupiedGridMap( const MapInfo &mapInfo );
 
@@ -61,6 +65,28 @@ OccupiedGridMap<MapBaseType>::OccupiedGridMap( const MapInfo &mapInfo ) : MapBas
 {
 
 }
+
+template<typename MapBaseType>
+OccupiedGridMap<MapBaseType>::OccupiedGridMap( const OccupiedGridMap &rhs ): MapBaseType( rhs ),
+									    currUpdateIndex( rhs.currUpdateIndex )
+{
+
+} 
+
+template<typename MapBaseType>
+OccupiedGridMap<MapBaseType>& OccupiedGridMap<MapBaseType>::operator=( const OccupiedGridMap &rhs )
+{
+	if( &rhs == this ){
+		return *this;
+	}
+
+	currUpdateIndex = rhs.currUpdateIndex;
+
+	this->MapBaseType::operator=( rhs );
+
+	return *this;	
+}
+
 
 template<typename MapBaseType>
 OccupiedGridMap<MapBaseType>::~OccupiedGridMap()
