@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "dataType.h"
+
 namespace slam{
 
 namespace simulation{
@@ -59,6 +61,33 @@ static int readLaserTXT(Laser *scan)
 	}
 	return count;
 }
+
+class Simulation
+{
+public:
+	Simulation();
+	~Simulation();
+	
+	bool openSimulationFile( const std::string &inputFile );
+	void closeSimulationFile();
+
+	inline bool readAFrameData( slam::sensor::LaserScan &scan );
+	
+		const int filePointPose()
+	{
+		return input_file.tellg();
+	}
+
+	inline int endOfFile()
+	{
+		return input_file.eof();
+	}
+	
+private:
+	std::ifstream input_file;
+	long count;
+};
+
 
 }
 
