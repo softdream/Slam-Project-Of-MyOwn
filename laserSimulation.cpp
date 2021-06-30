@@ -48,7 +48,7 @@ bool Simulation::readAFrameData( slam::sensor::LaserScan &scan )
 	
                 if (tag.compare("laser") == 0) {
 		
-			for (int i = 0; i < 360; i++) {
+			for (int i = 0; i < scan.size(); i++) {
                                 iss >> num;
                                 //std::cout << num << "\t";
                                 //iss >> scan[count].range[i];
