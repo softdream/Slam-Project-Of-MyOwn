@@ -31,7 +31,7 @@ int main()
 
 	// slam process
 	// while it is not the end of the simulation file
-	while( simulation.endOfFile() > 0 ){
+	while( !simulation.endOfFile() ){
 		// 1. get the laser data
 		slam::sensor::LaserScan scan;
 		slam::ScanContainer scanContainer;
