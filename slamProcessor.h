@@ -45,7 +45,7 @@ private:
 	OccupiedMap *occupiedGridMap;
 	ScanMatchMethod *scanMatch;
 
-	//------------- Parameters --------------//
+	// ------------ Parameters -------------- //
 	float minDistanceDiffForMapUpdate;
 	float minAngleDiffForMapUpdate;
 	

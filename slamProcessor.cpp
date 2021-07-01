@@ -2,7 +2,8 @@
 
 namespace slam {
 
-SlamProcessor::SlamProcessor()
+SlamProcessor::SlamProcessor(): minDistanceDiffForMapUpdate( 0.4 ),
+				minAngleDiffForMapUpdate( 0.9 ) // default parameter
 {
 	occupiedGridMap = new OccupiedMap();
 	if( occupiedGridMap == nullptr ){
@@ -35,7 +36,8 @@ SlamProcessor::~SlamProcessor()
 	}
 }
 
-SlamProcessor::SlamProcessor( int sizeX_, int sizeY_, float cellLength_ )
+SlamProcessor::SlamProcessor( int sizeX_, int sizeY_, float cellLength_ ): minDistanceDiffForMapUpdate( 0.4 ),
+                                					   minAngleDiffForMapUpdate( 0.9 ) // default parameter
 {
 	occupiedGridMap = new OccupiedMap( sizeX_, sizeY_, cellLength_ );	
 	if( occupiedGridMap == nullptr ){
