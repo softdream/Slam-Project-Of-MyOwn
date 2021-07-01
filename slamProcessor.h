@@ -33,11 +33,18 @@ public:
 	void processTheFirstScan( Eigen::Vector3f &robotPoseInWorld,
 				  ScanContainer &scanContainer );
 	
+	void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container );
+
+	Eigen::Vector3f getLastScanMatchPose() const;
+//	const Eigen::Vector3f getLastScanMatchPose() const;
+
+	Eigen::Vector3f getLastMapUpdatePose() const;
+//	const Eigen::Vector3f getLastMapUpdatePose() const;
 
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 
-	void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container );
+	//void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container );
 
 private:
 

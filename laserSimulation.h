@@ -71,16 +71,21 @@ public:
 	bool openSimulationFile( const std::string &inputFile );
 	void closeSimulationFile();
 
-	inline bool readAFrameData( slam::sensor::LaserScan &scan );
+	bool readAFrameData( slam::sensor::LaserScan &scan );
 	
-		const int filePointPose()
+	inline const int filePointPose()
 	{
 		return input_file.tellg();
 	}
 
-	inline int endOfFile()
+	inline const int endOfFile()
 	{
 		return input_file.eof();
+	}
+	
+	inline const long getFrameCount() const
+	{
+		return count;
 	}
 	
 private:

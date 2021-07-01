@@ -140,7 +140,7 @@ void SlamProcessor::processTheFirstScan( Eigen::Vector3f &robotPoseInWorld,
 	occupiedGridMap->updateByScan( scanContainer, robotPoseInWorld );
 }
 
-void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
+void SlamProcessor::laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
 {
 	container.clear();
 
@@ -163,6 +163,27 @@ void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContain
 	// std::cout<<"Scan Container Size: "<<constainer.getSize()<<std::endl;
 }
 
+
+
+Eigen::Vector3f SlamProcessor::getLastScanMatchPose() const
+{
+	return lastScanMatchPose;
+}
+
+/*const Eigen::Vector3f SlamProcessor::getLastScanMatchPose() const
+{
+        return lastScanMatchPose;
+}*/
+
+Eigen::Vector3f SlamProcessor::getLastMapUpdatePose() const
+{
+	return lastMapUpdatePose;
+}
+
+/*const Eigen::Vector3f SlamProcessor::getLastMapUpdatePose() const
+{
+        return lastMapUpdatePose;
+}*/
 
 
 }
