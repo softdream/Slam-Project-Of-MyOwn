@@ -16,10 +16,10 @@ public:
 	IMUCalibration();
 	~IMUCalibration();
 
-	void addDataOfAccelerometer( const IMU &imu );
+	virtual void addDataOfAccelerometer( const IMU &imu );
 	void addDataOfGyrometer( const IMU &imu );
 
-	bool calibrateAccelerometer();
+	virtual bool calibrateAccelerometer();
 	bool calibrateGyrometer();
 
 	Eigen::RowVector3f getAccelBias() const;
