@@ -220,6 +220,8 @@ bool Calibration::calibrateAccelerometer()
 	// 2. iteration
 	int count = 0;
 	while( step > accuracy && count < maxIteration ){
+		count ++;
+		
 		// 3. initial the jacobian and hessian 
 		Hessian = Eigen::Matrix<float, 6, 6>::Zero();
 		Jacobian = Eigen::Matrix<float, 6, 1>::Zero();

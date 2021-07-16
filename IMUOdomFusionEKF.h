@@ -18,10 +18,13 @@ public:
 	EKF();
 	~EKF();
 	
-	void setRobotWidth();
-	void setDeltaT();
-	void setNoiseR();
-	void setNoiseQ();
+	void setL(const float l);
+	void setDeltaT( const float dt );
+	void setNoiseR( const Eigen::Matrix<float, 4, 4> &R );
+	void setNoiseR( const float r1, const float r2, const float r3, const float r4 );
+	void setNoiseQ( const Eigen::Matrix<float, 6, 6> &Q );
+	void setNoiseQ( const float q1, const float q2, const float q3, 
+		      	const float q4, const float q5, const float q6 );
 	
 	const Eigen::Matrix<float, 6, 1> getStateX();	
 

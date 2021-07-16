@@ -82,6 +82,7 @@ void EKF::predict()
 	F(3, 5) = dt;
 	
 	// ---------- 4. prediction of the covariance matrix ------------//
+	//	P^(t) = F * P(t-1) * F.transpose() + Q
 	P_estimate = F * P_previous * F.transpose() + Q;
 }
 
@@ -121,6 +122,46 @@ const Eigen::Matrix<float, 6, 1> EKF::getStateX()
 	return X;
 }
 
+void EKF::setL( const float l )
+{
+	this->l = l;
+}
+
+void EKF::setDeltaT( const float dt )
+{
+	this->dt = dt;
+}
+
+void EKF::setNoiseR( const Eigen::Matrix<float, 4, 4> &R )
+{
+	this->R = R;
+}
+	
+void EKF::setNoiseR( const float r1, const float r2, const float r3, const float r4 )
+{
+	R(0, 0) = r1;
+	R(1, 1) = r2;
+	R(2, 2) = r3;
+	R(3, 3) = r4;
+}
+	
+void EKF::setNoiseQ( const Eigen::Matrix<float, 6, 6> &Q )
+{
+	this->Q = Q;
+}
+	
+void setNoiseQ( const float q1, const float q2, const float q3, 
+		      	const float q4, const float q5, const float q6 )
+{
+	Q(0, 0) = q1;
+	Q(1, 1) = q2;
+	Q(2, 2) = q3;
+	Q(3, 3) = q4;
+	Q(4, 4) = q5;
+	Q(5, 5) = q6;
+}
+	
+	
 	
 }
 
