@@ -82,6 +82,7 @@ void EKF::predict()
 	F(3, 5) = dt;
 	
 	// ---------- 4. prediction of the covariance matrix ------------//
+	//	P^(t) = F * P(t-1) * F.transpose() + Q
 	P_estimate = F * P_previous * F.transpose() + Q;
 }
 
