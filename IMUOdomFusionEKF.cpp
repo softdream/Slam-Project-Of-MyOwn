@@ -116,7 +116,7 @@ void EKF::setInputObservation( const float vr, const float vl, const float w, co
 	     a;	
 }
 
-Eigen::Matrix<float, 6, 1> EKF::getStateX()
+const Eigen::Matrix<float, 6, 1> EKF::getStateX()
 {
 	return X;
 }

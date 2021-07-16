@@ -23,7 +23,7 @@ public:
 	void setNoiseR();
 	void setNoiseQ();
 	
-	Eigen::Matrix<float, 6, 1> getStateX();	
+	const Eigen::Matrix<float, 6, 1> getStateX();	
 
 	void setPreviousState( const float x, const float y, const float theta, const float v, const float w, const float a );
 	void setPreviousCovariance( const float p0, const float p1, const float p2, const float p3, const float p4, const float p5 );

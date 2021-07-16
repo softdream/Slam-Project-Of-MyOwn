@@ -131,42 +131,42 @@ bool IMUCalibration::calibrateGyrometer()
 	return true;
 }
 
-Eigen::RowVector3f IMUCalibration::getAccelBias() const
+const Eigen::RowVector3f IMUCalibration::getAccelBias() const
 {
 	return ellipsoidCenter;
 }
 
-Eigen::Vector3f IMUCalibration::getGyroBias() const
+const Eigen::Vector3f IMUCalibration::getGyroBias() const
 {
 	return gyroBias;
 }
 
-float IMUCalibration::getAccelBiasX() const
+const float IMUCalibration::getAccelBiasX() const
 {
 	return ellipsoidCenter[0];
 }
 
-float IMUCalibration::getAccelBiasY() const
+const float IMUCalibration::getAccelBiasY() const
 {
 	return ellipsoidCenter[1];
 }
 
-float IMUCalibration::getAccelBiasZ() const
+const float IMUCalibration::getAccelBiasZ() const
 {
 	return ellipsoidCenter[2];
 }
 
-float IMUCalibration::getGyroBiasX() const
+const float IMUCalibration::getGyroBiasX() const
 {
 	return gyroBias[0];
 }
 
-float IMUCalibration::getGyroBiasY() const
+const float IMUCalibration::getGyroBiasY() const
 {
 	return gyroBias[1];
 }
 
-float IMUCalibration::getGyroBiasZ() const
+const float IMUCalibration::getGyroBiasZ() const
 {
 	return gyroBias[2];
 }

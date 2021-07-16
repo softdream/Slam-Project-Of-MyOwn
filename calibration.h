@@ -26,37 +26,37 @@ public:
 
 	void setInitialSolutionValue( const float offsetX, const float offsetY, const float offsetZ, const float scaleX, const float scaleY, const float scaleZ );
 
-	inline Eigen::Matrix<float, 6, 1> getBeta() const 
+	inline const Eigen::Matrix<float, 6, 1> getBeta() const 
 	{
 		return beta;
 	}
 	
-	inline float getOffsetX() const
+	inline const float getOffsetX() const
 	{
 		return beta(0);	
 	}
 	
-	inline float getOffsetY() const
+	inline const float getOffsetY() const
         {       
                 return beta(1);
         }
 
-	inline float getOffsetZ() const
+	inline const float getOffsetZ() const
         {       
                 return beta(2);
         }
 
-	inline float getScaleX() const 
+	inline const float getScaleX() const 
 	{
 		return beta(3);
 	}
 	
-	inline float getScaleY() const
+	inline const float getScaleY() const
         {
                 return beta(4);
         }
 
-	inline float getScaleZ() const
+	inline const float getScaleZ() const
         {
                 return beta(5);
         }

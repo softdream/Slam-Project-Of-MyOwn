@@ -22,16 +22,16 @@ public:
 	virtual bool calibrateAccelerometer();
 	bool calibrateGyrometer();
 
-	Eigen::RowVector3f getAccelBias() const;
-	Eigen::Vector3f getGyroBias() const;
+	const Eigen::RowVector3f getAccelBias() const;
+	const Eigen::Vector3f getGyroBias() const;
 
-	float getAccelBiasX() const;
-	float getAccelBiasY() const;
-	float getAccelBiasZ() const;
+	const float getAccelBiasX() const;
+	const float getAccelBiasY() const;
+	const float getAccelBiasZ() const;
 
-	float getGyroBiasX() const;
-	float getGyroBiasY() const;
-	float getGyroBiasZ() const;
+	const float getGyroBiasX() const;
+	const float getGyroBiasY() const;
+	const float getGyroBiasZ() const;
 
 private:
 	template<typename T>
