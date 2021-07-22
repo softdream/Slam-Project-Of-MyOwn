@@ -27,14 +27,18 @@ void laserData2Container( const slam::simulation::Laser &scan, slam::ScanContain
 
 int main()
 {
-  std::cout<<"-----------------------  ICP TEST ------------------------"<<std::endl;
-  slam::simulation::Laser scanArray[2];
+  	std::cout<<"-----------------------  ICP TEST ------------------------"<<std::endl;
+	slam::ICP icp;
+  	slam::simulation::Laser scanArray[2];
   
-  slam::ScanContainer laserPoints[2];
+  	slam::ScanContainer laserPoints[2];
 	slam::simulation::readLaserTXT( scanArray );
   
-  laserData2Container( scanArray[0], laserPoints[0] );
-  laserData2Container( scanArray[1], laserPoints[1] );
+  	laserData2Container( scanArray[0], laserPoints[0] );
+  	laserData2Container( scanArray[1], laserPoints[1] );
   
-  return 0;
+	float loss = icp.solveICP( laserPoints[0], laserPoints[1] );
+	std::cout<<"loss = "<<loss<<std::endl;
+	
+  	return 0;
 }
