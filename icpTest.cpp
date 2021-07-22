@@ -40,5 +40,13 @@ int main()
 	float loss = icp.solveICP( laserPoints[0], laserPoints[1] );
 	std::cout<<"loss = "<<loss<<std::endl;
 	
+	std::cout<<"--------------------------------------------"<<std::endl;
+	Eigen::Matrix<float, 2, 2> R = icp.getRotateMatrix();
+	std::cout<<"R  = "<<std::endl<<R<<std::endl;
+	
+	std::cout<<"--------------------------------------------"<<std::endl;
+	Eigen::Vector2f T = icp.getTransform();
+	std::cout<<"T = "<<std::endl<<T<<std::endl;
+	
   	return 0;
 }
