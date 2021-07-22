@@ -13,7 +13,16 @@ public:
 	~ICP();
 
 	const float solveICP( ScanContainer& A_src, ScanContainer& B_src );
-
+	inline const Eigen::Matrix<float, 2, 2> getRotateMatrix() const
+	{
+		return R;
+	}
+	
+	inline const Eigen::Vector2f getTransform() const 
+	{
+		return T;
+	}
+	
 private:
 	float iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vector2f>& B_apostrophe );
 
