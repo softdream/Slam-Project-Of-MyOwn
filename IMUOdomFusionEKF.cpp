@@ -150,15 +150,15 @@ void EKF::setNoiseQ( const Eigen::Matrix<float, 6, 6> &Q )
 	this->Q = Q;
 }
 	
-void setNoiseQ( const float q1, const float q2, const float q3, 
+void EKF::setNoiseQ( const float q1, const float q2, const float q3, 
 		      	const float q4, const float q5, const float q6 )
 {
-	Q(0, 0) = q1;
-	Q(1, 1) = q2;
-	Q(2, 2) = q3;
-	Q(3, 3) = q4;
-	Q(4, 4) = q5;
-	Q(5, 5) = q6;
+	this->Q(0, 0) = q1;
+	this->Q(1, 1) = q2;
+	this->Q(2, 2) = q3;
+	this->Q(3, 3) = q4;
+	this->Q(4, 4) = q5;
+	this->Q(5, 5) = q6;
 }
 	
 	
