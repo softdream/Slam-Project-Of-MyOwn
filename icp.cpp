@@ -15,7 +15,7 @@ ICP::~ICP()
 
 const float ICP::solveICP( ScanContainer& A_src, ScanContainer& B_src )
 {
-	std::vector<Eigen::Vector2f> A;
+	A.clear();
 	std::vector<Eigen::Vector2f> B; 
 	std::vector<Eigen::Vector2f> B_apostrophe( B_src.getSize(), Eigen::Vector2f( 0.0f, 0.0f ) );	
 
