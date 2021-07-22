@@ -13,7 +13,7 @@ ICP::~ICP()
 
 }
 
-const float ICP::solveICP()( ScanContainer& A_src, ScanContainer& B_src )
+const float ICP::solveICP( ScanContainer& A_src, ScanContainer& B_src )
 {
 	std::vector<Eigen::Vector2f> A;
 	std::vector<Eigen::Vector2f> B; 
