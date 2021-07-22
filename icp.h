@@ -21,7 +21,7 @@ private:
 	Eigen::Vector2f Acenter;
 	Eigen::Vector2f Bcenter;
 
-	std::vector<Eigen::Vector2f> A;
+//	std::vector<Eigen::Vector2f> A;
 //        std::vector<Eigen::Vector2f> B;	
 
 	std::vector<Eigen::Vector2f> a;
