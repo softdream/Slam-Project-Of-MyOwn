@@ -12,7 +12,7 @@ public:
 	ICP();
 	~ICP();
 
-	const float operator()( ScanContainer& A_src, ScanContainer& B_src );
+	const float solveICP( ScanContainer& A_src, ScanContainer& B_src );
 
 private:
 	float iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vector2f>& B_apostrophe );
