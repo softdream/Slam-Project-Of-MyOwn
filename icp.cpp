@@ -15,6 +15,7 @@ ICP::~ICP()
 
 const float ICP::operator()( ScanContainer& A_src, ScanContainer& B_src )
 {
+	std::vector<Eigen::Vector2f> A;
 	std::vector<Eigen::Vector2f> B; 
 	std::vector<Eigen::Vector2f> B_apostrophe( B_src.getSize(), Eigen::Vector2f( 0.0f, 0.0f ) );	
 
@@ -36,6 +37,7 @@ const float ICP::operator()( ScanContainer& A_src, ScanContainer& B_src )
 
 	// 2. Caculate the distance from points to the center of A
 	// a_i = A_i - A_center, i = 1, 2, ...., n
+	a.clear();
 	for( auto it : A ){
 		Eigen::Vector2f tmp = it - Acenter;
 		a.push_back( tmp );
@@ -74,6 +76,7 @@ float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vect
 	}
 	Bcenter = Bsum / B.size();
 
+	b.clear();
 	for( auto it : B ){
 		Eigen::Vector2f tmp = it - Bcenter;
 		b.push_back( tmp );
