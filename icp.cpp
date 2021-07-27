@@ -1,5 +1,6 @@
 #include "icp.h"
 #include <cmath>
+#include <iostream>
 
 namespace slam{
 
@@ -91,7 +92,8 @@ float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vect
 		x += ( a[i](0) * b[i](0) ) + ( a[i](1) * b[i](1) );
 	}
 	float theta = ::atan2( y, x );
-	
+	std::cout<<"theta = "<<theta<<std::endl;	
+
 	// 4. get the rotate matrix and transfrom matrix
 	//	R = |cos(theta), -sin(theta)|
 	//	    |sin(theta),  cos(theta)|
