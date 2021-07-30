@@ -33,11 +33,11 @@ static T toRad(const T degVal)
 	return degVal * static_cast<T>(M_PI / 180.0);
 }
 
-}
-
 static inline float sqr(float val)
 {
   return val*val;
+}
+
 }
 
 #endif
