@@ -26,7 +26,7 @@ SlamProcessor::SlamProcessor(): minDistanceDiffForMapUpdate( 0.4 ),
 	lastMapUpdatePose = Eigen::Vector3f::Zero();
 
 	// init the image size
-	image = cv::Mat::zeros(occupiedGridMap->getSizeX(), occupiedGridMap->getSizeY(), CV_8UC3);
+	//image = cv::Mat::zeros(occupiedGridMap->getSizeX(), occupiedGridMap->getSizeY(), CV_8UC3);
 
 }
 
@@ -64,7 +64,7 @@ SlamProcessor::SlamProcessor( int sizeX_, int sizeY_, float cellLength_ ): minDi
         lastMapUpdatePose = Eigen::Vector3f::Zero();
 	
 	// init the image size
-        image = cv::Mat::zeros(occupiedGridMap->getSizeX(), occupiedGridMap->getSizeY(), CV_8UC3);
+        //image = cv::Mat::zeros(occupiedGridMap->getSizeX(), occupiedGridMap->getSizeY(), CV_8UC3);
 
 }
 
@@ -153,18 +153,18 @@ void SlamProcessor::laserData2Container( const slam::sensor::LaserScan &scan, sl
 	std::cout<<"------------------ Laser Data To Container -----------------"<<std::endl;
 	container.clear();
 
-	float theta = -std::fabs(-3.12144f - 3.14159f) / 360;
-	//float theta = std::fabs( scan.angle_min );
+	float theta =  -3.12414f ;
+	//float theta = -std::fabs( scan.angle_min );
 	//std::cout<<"theta = "<<theta<<std::endl;
 	
 	for( int i = 0; i < scan.size(); ++ i ){
 		float dist = scan.ranges[ i ];
-	//	std::cout<<"distance = "<<dist<<std::endl;		
+		std::cout<<"distance = "<<dist<<std::endl;		
 
 		//if( dist >= scan.range_min && dist <= scan.range_max ){
 		if( dist >= 0.1f && dist <= 12.0f ){
 			Eigen::Vector2f point( ::cos( theta ) * dist, ::sin( theta ) * dist );
-	//		std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
+//			std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
 			
 			container.addData( point );
 		}
@@ -199,7 +199,7 @@ const Eigen::Vector3f SlamProcessor::getLastMapUpdatePose() const
 }
 
 
-void SlamProcessor::displayMap() const
+void SlamProcessor::displayMap( cv::Mat &image ) 
 {
 	
 	int occupiedCount = 0;

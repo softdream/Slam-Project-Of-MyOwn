@@ -66,7 +66,8 @@ Eigen::Vector3f ScanMatchMethod::bilinearInterpolationWithDerivative( const Occu
 
         // 2. map coords are always positive, floor them by casting to int
         Eigen::Vector2i indMin( coords.cast<int>() );
-
+//	std::cout<<"intergerMin = "<<std::endl<<indMin<<std::endl;
+	
         // 3. factor0 = ( x - x0 )
         //    factor1 = ( y - y0 )
         float factor0 = coords[0] - static_cast<float>( indMin[0] );
@@ -78,15 +79,19 @@ Eigen::Vector3f ScanMatchMethod::bilinearInterpolationWithDerivative( const Occu
 
         // 5. get the probability of the four points
         mP00 = occuMap.getCellOccupiedProbability( index );
+	std::cout<<"Mp(00) = "<<mP00<<std::endl;	
 
         index ++;
         mP10 = occuMap.getCellOccupiedProbability( index );
+	std::cout<<"Mp(10) = "<<mP10<<std::endl;
 
         index += sizeX - 1;
         mP01 = occuMap.getCellOccupiedProbability( index );
+	std::cout<<"Mp(01) = "<<mP01<<std::endl;
 
         index ++;
         mP11 = occuMap.getCellOccupiedProbability( index );
+	std::cout<<"Mp(11) = "<<mP11<<std::endl;
 
         // 6. factorInv0 = 1 - ( x - x0 )
         //    factorInv1 = 1 - ( y - y0 )
@@ -116,7 +121,9 @@ void ScanMatchMethod::getHessianDerivative( const OccupiedMap &occuMap,
 
 	float sinRot = ::sin( robotPoseInWorld[2] );
 	float cosRot = ::cos( robotPoseInWorld[2] );
-
+//	std::cout<<"sinRot = "<<sinRot<<std::endl;	
+//	std::cout<<"cosRot = "<<cosRot<<std::endl;
+	
 	H = Eigen::Matrix3f::Zero();
 	dTr = Eigen::Vector3f::Zero();	
 
@@ -127,12 +134,15 @@ void ScanMatchMethod::getHessianDerivative( const OccupiedMap &occuMap,
 	
 		// 2. Transform the End Point from Laser Coordinate to World Coordinate
 		Eigen::Vector2f currPointInWorld( occuMap.observedPointPoseLaser2World( currPointInLaser, robotPoseInWorld ) );
-		
+//		std::cout<<"currPointInWorld: "<<std::endl<<currPointInWorld<<std::endl;		
+
 		// 3. Transform the End Point from World Coordinate to Map Coordinate
 		Eigen::Vector2f currPointInMap( occuMap.observedPointPoseWorld2Map( currPointInWorld ) );
+//		std::cout<<"currPointInMap: "<<std::endl<<currPointInMap<<std::endl;		
 
 		// 4. get the M(Pm), d(M(Pm))/dx, d(M(Pm))/dy
 		Eigen::Vector3f interpolatedValue( bilinearInterpolationWithDerivative( occuMap, currPointInMap ) );
+//		std::cout<<"interpolatedValue: "<<std::endl<<interpolatedValue<<std::endl;
 		
 		// 5. the Objective Function: f(x) = 1 - M(Pm)
 		float funcValue = 1.0f - interpolatedValue[0];
@@ -170,13 +180,14 @@ bool ScanMatchMethod::estimateTransformationOnce( const OccupiedMap &occuMap,
 {
 	getHessianDerivative( occuMap, estimateInWorld, scanPoints, H, dTr );
 	
-	//std::cout<<"Hessian : "<<std::endl;
-	//std::cout<<H<<std::endl;
-	//std::cout<<"dTr: "<<std::endl;
-	//std::cout<<dTr<<std::endl;;
+//	std::cout<<"Hessian : "<<std::endl;
+//	std::cout<<H<<std::endl;
+//	std::cout<<"dTr: "<<std::endl;
+//	std::cout<<dTr<<std::endl;;
 
 	if ( ( H(0, 0) != 0.0f ) && ( H(1, 1) != 0.0f ) ){
 		Eigen::Vector3f deltaCauchy( H.inverse() * dTr );
+//		std::cout<<"delata Cauchy: "<<std::endl<<deltaCauchy<<std::endl;
 		
 		if( deltaCauchy[2] > 0.2f ){
 			deltaCauchy[2] = 0.2f;
@@ -210,7 +221,9 @@ Eigen::Vector3f ScanMatchMethod::scanToMap( const OccupiedMap &occuMap,
                         const ScanContainer &scanPoints, 
                         Eigen::Matrix3f &covarinceMatrix, 
                         int maxInterations )
-{	
+{
+	std::cout<<"-----------------------------------LOGGGGG ---- OccupiedMap.getSizeX(): "<<occuMap.getSizeX()<<std::endl;
+		
 	Eigen::Vector3f estimatePose( beginEstimatedPoseInWorld );
 
 	if( scanPoints.getSize() == 0 ){
@@ -221,10 +234,10 @@ Eigen::Vector3f ScanMatchMethod::scanToMap( const OccupiedMap &occuMap,
 	estimateTransformationOnce( occuMap, estimatePose, scanPoints );
 	
 	// 2. multiple iterations
-	for( int i = 0; i < maxInterations - 1; i ++ ){
-		estimateTransformationOnce( occuMap, estimatePose, scanPoints );
+//	for( int i = 0; i < maxInterations - 1; i ++ ){
+//		estimateTransformationOnce( occuMap, estimatePose, scanPoints );
 			
-	}
+//	}
 	
 	// 3. normalize the angle [-PI ~ PI]
 	estimatePose[2] = normalize_angle( estimatePose[2] );

@@ -42,7 +42,7 @@ public:
 //	Eigen::Vector3f getLastMapUpdatePose() const;
 	const Eigen::Vector3f getLastMapUpdatePose() const;
 
-	void displayMap() const;
+	void displayMap( cv::Mat &image ) ;
 
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
@@ -65,7 +65,7 @@ private:
 	Eigen::Vector3f lastMapUpdatePose;
 	
 	// ------------ opencv map -------------- //
-	cv::Mat image;
+	//cv::Mat image;
 }; 
 
 }
