@@ -13,6 +13,7 @@ public:
 	~ICP();
 
 	const float solveICP( ScanContainer& A_src, ScanContainer& B_src );
+	
 	inline const Eigen::Matrix<float, 2, 2> getRotateMatrix() const
 	{
 		return R;
