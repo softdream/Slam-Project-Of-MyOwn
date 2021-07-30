@@ -159,7 +159,7 @@ void SlamProcessor::laserData2Container( const slam::sensor::LaserScan &scan, sl
 	
 	for( int i = 0; i < scan.size(); ++ i ){
 		float dist = scan.ranges[ i ];
-		std::cout<<"distance = "<<dist<<std::endl;		
+	//	std::cout<<"distance = "<<dist<<std::endl;		
 
 		//if( dist >= scan.range_min && dist <= scan.range_max ){
 		if( dist >= 0.1f && dist <= 12.0f ){

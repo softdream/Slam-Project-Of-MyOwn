@@ -81,7 +81,8 @@ int main()
 			// 4. display the map
 			slam.displayMap( image );
 		}
-		cv::waitKey(1000);	
+		cv::waitKey(50);	
+	//	sleep(1);
 		count ++;
 	}
 		

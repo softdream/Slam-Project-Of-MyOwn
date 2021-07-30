@@ -79,19 +79,19 @@ Eigen::Vector3f ScanMatchMethod::bilinearInterpolationWithDerivative( const Occu
 
         // 5. get the probability of the four points
         mP00 = occuMap.getCellOccupiedProbability( index );
-	std::cout<<"Mp(00) = "<<mP00<<std::endl;	
+//	std::cout<<"Mp(00) = "<<mP00<<std::endl;	
 
         index ++;
         mP10 = occuMap.getCellOccupiedProbability( index );
-	std::cout<<"Mp(10) = "<<mP10<<std::endl;
+//	std::cout<<"Mp(10) = "<<mP10<<std::endl;
 
         index += sizeX - 1;
         mP01 = occuMap.getCellOccupiedProbability( index );
-	std::cout<<"Mp(01) = "<<mP01<<std::endl;
+//	std::cout<<"Mp(01) = "<<mP01<<std::endl;
 
         index ++;
         mP11 = occuMap.getCellOccupiedProbability( index );
-	std::cout<<"Mp(11) = "<<mP11<<std::endl;
+//	std::cout<<"Mp(11) = "<<mP11<<std::endl;
 
         // 6. factorInv0 = 1 - ( x - x0 )
         //    factorInv1 = 1 - ( y - y0 )
@@ -234,10 +234,10 @@ Eigen::Vector3f ScanMatchMethod::scanToMap( const OccupiedMap &occuMap,
 	estimateTransformationOnce( occuMap, estimatePose, scanPoints );
 	
 	// 2. multiple iterations
-//	for( int i = 0; i < maxInterations - 1; i ++ ){
-//		estimateTransformationOnce( occuMap, estimatePose, scanPoints );
+	for( int i = 0; i < maxInterations - 1; i ++ ){
+		estimateTransformationOnce( occuMap, estimatePose, scanPoints );
 			
-//	}
+	}
 	
 	// 3. normalize the angle [-PI ~ PI]
 	estimatePose[2] = normalize_angle( estimatePose[2] );
