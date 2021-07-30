@@ -169,10 +169,11 @@ bool ScanMatchMethod::estimateTransformationOnce( const OccupiedMap &occuMap,
                                  const ScanContainer &scanPoints )
 {
 	getHessianDerivative( occuMap, estimateInWorld, scanPoints, H, dTr );
-	std::cout<<"Hessian : "<<std::endl;
-	std::cout<<H<<std::endl;
-	std::cout<<"dTr: "<<std::endl;
-	std::cout<<dTr<<std::endl;;
+	
+	//std::cout<<"Hessian : "<<std::endl;
+	//std::cout<<H<<std::endl;
+	//std::cout<<"dTr: "<<std::endl;
+	//std::cout<<dTr<<std::endl;;
 
 	if ( ( H(0, 0) != 0.0f ) && ( H(1, 1) != 0.0f ) ){
 		Eigen::Vector3f deltaCauchy( H.inverse() * dTr );

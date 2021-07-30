@@ -7,7 +7,17 @@ namespace sensor{
 
 template<int Size>
 struct LidarScan{
-	LidarScan(){}
+	LidarScan() : angle_min(3.12414),
+			angle_max(3.14159),
+			angle_increment(0.0174532924),
+			time_increment(0.0004022129),
+			range_min(0.1500000060),
+			range_max(12.0000000000)		
+	{
+		memset( this->ranges, 0, Size );
+		memset( this->intensities, 0, Size );
+	}
+
 	~LidarScan(){}
 
 	LidarScan( const LidarScan& obj ) : angle_min( obj.angle_min ),

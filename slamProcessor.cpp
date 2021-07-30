@@ -142,25 +142,30 @@ void SlamProcessor::processTheFirstScan( Eigen::Vector3f &robotPoseInWorld,
 
 void SlamProcessor::laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
 {
+	std::cout<<"------------------ Laser Data To Container -----------------"<<std::endl;
 	container.clear();
 
-	//float theta = -std::fabs(-3.12144 - 3.14159) / 360;
-	float theta = std::fabs( scan.angle_min );
-
+	float theta = -std::fabs(-3.12144f - 3.14159f) / 360;
+	//float theta = std::fabs( scan.angle_min );
+	//std::cout<<"theta = "<<theta<<std::endl;
+	
 	for( int i = 0; i < scan.size(); ++ i ){
 		float dist = scan.ranges[ i ];
+	//	std::cout<<"distance = "<<dist<<std::endl;		
 
-		if( dist >= scan.range_min && dist <= scan.range_max ){
+		//if( dist >= scan.range_min && dist <= scan.range_max ){
+		if( dist >= 0.1f && dist <= 12.0f ){
 			Eigen::Vector2f point( ::cos( theta ) * dist, ::sin( theta ) * dist );
-			//std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
+	//		std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
 			
 			container.addData( point );
 		}
 		
-		theta += std::fabs( scan.angle_increment );
+	//	theta += std::fabs( scan.angle_increment );
+		theta += std::fabs( 0.0174533f );
 	}
 	
-	// std::cout<<"Scan Container Size: "<<constainer.getSize()<<std::endl;
+	 std::cout<<"Scan Container Size: "<<container.getSize()<<std::endl;
 }
 
 
