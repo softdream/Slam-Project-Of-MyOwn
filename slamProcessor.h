@@ -4,6 +4,7 @@
 #include "scanMatch.h"
 #include "dataType.h"
 
+#include <opencv2/opencv.hpp>
 
 namespace slam {
 
@@ -41,6 +42,8 @@ public:
 //	Eigen::Vector3f getLastMapUpdatePose() const;
 	const Eigen::Vector3f getLastMapUpdatePose() const;
 
+	void displayMap() const;
+
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 
@@ -61,6 +64,8 @@ private:
 	Eigen::Vector3f lastScanMatchPose;
 	Eigen::Vector3f lastMapUpdatePose;
 	
+	// ------------ opencv map -------------- //
+	cv::Mat image;
 }; 
 
 }

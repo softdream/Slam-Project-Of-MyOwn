@@ -56,6 +56,7 @@ int main()
 			std::cout<<"---------------- Process The First Laser Scan --------------------"<<std::endl;		
 	
 			// display the map
+			slam.displayMap();
 		}	
 	
 		// 3. Update by Scan Match, get the estimated pose 
@@ -68,7 +69,8 @@ int main()
 		std::cout<<"------------------"<<std::endl;
 	
 		// 4. display the map
-
+		slam.displayMap();
+	
 		sleep(1);
 	}
 		

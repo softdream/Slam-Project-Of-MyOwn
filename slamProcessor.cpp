@@ -1,5 +1,6 @@
 #include "slamProcessor.h"
 
+
 namespace slam {
 
 SlamProcessor::SlamProcessor(): minDistanceDiffForMapUpdate( 0.4 ),
@@ -23,6 +24,10 @@ SlamProcessor::SlamProcessor(): minDistanceDiffForMapUpdate( 0.4 ),
 	covarianceMatrix = Eigen::Matrix3f::Zero();
 	lastScanMatchPose = Eigen::Vector3f::Zero();
 	lastMapUpdatePose = Eigen::Vector3f::Zero();
+
+	// init the image size
+	image = cv::Mat::zeros(occupiedGridMap->getSizeX(), occupiedGridMap->getSizeY(), CV_8UC3);
+
 }
 
 SlamProcessor::~SlamProcessor()
@@ -57,6 +62,9 @@ SlamProcessor::SlamProcessor( int sizeX_, int sizeY_, float cellLength_ ): minDi
         covarianceMatrix = Eigen::Matrix3f::Zero();
         lastScanMatchPose = Eigen::Vector3f::Zero();
         lastMapUpdatePose = Eigen::Vector3f::Zero();
+	
+	// init the image size
+        image = cv::Mat::zeros(occupiedGridMap->getSizeX(), occupiedGridMap->getSizeY(), CV_8UC3);
 
 }
 
@@ -190,6 +198,35 @@ const Eigen::Vector3f SlamProcessor::getLastMapUpdatePose() const
         return lastMapUpdatePose;
 }
 
+
+void SlamProcessor::displayMap() const
+{
+	
+	int occupiedCount = 0;
+
+	for( int i = 0; i < occupiedGridMap->getSizeX(); i ++ ){
+		for( int j = 0; j < occupiedGridMap->getSizeY(); j ++ ){
+			if( occupiedGridMap->isCellFree( i, j ) ){
+                                cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(255, 255, 255), 1);
+                                //std::cout<<"Free Point: ( "<<i<<", "<<j<<" )"<<std::endl;
+                                //std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+                        }
+                        else if( occupiedGridMap->isCellOccupied( i, j ) ){
+                                occupiedCount ++;
+                                //std::cout<<"Occupied Point: ( "<<i<<", "<<j<<" )"<<std::endl;
+                                //std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+                                //std::cout<<"log Odds value: "<<occumap.getCellLogOdds(i, j)<<std::endl;
+                                cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), 1);
+                        }
+
+		}
+	}
+
+	std::cout<<"---------------- Result --------------------"<<std::endl;
+        std::cout<<"Occupied Points Number: "<<occupiedCount<<std::endl;
+
+        cv::imshow( "map", image );
+}
 
 }
 
