@@ -56,5 +56,10 @@ void GridCellOperations::setCellOccupied( GridCell &cell ) const
 	cell.logOddsValue += logOddsPocc;
 }
 
+void GridCellOperations::setCellUnFree( GridCell &cell ) const
+{
+	cell.logOddsValue -= logOddsPfree;
+}
+
 
 }

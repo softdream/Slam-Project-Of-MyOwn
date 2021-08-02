@@ -18,7 +18,8 @@ public:
 
 	void setCellFree( GridCell &cell ) const;
 	void setCellOccupied( GridCell &cell ) const;
-
+	void setCellUnFree( GridCell &cell ) const;
+	
 private:
 	float probability2LogOdds( float prob );
 

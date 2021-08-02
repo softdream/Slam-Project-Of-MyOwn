@@ -46,29 +46,32 @@ private:
 
 private:
 	int currUpdateIndex;
+	int currMarkOccIndex;
+	int currMarkFreeIndex;
 };
 
 template<typename MapBaseType>
-OccupiedGridMap<MapBaseType>::OccupiedGridMap() : MapBaseType(), currUpdateIndex(0)
+OccupiedGridMap<MapBaseType>::OccupiedGridMap() : MapBaseType(), currUpdateIndex(0), currMarkOccIndex(-1), currMarkFreeIndex(-1)
 {
 
 }
 
 template<typename MapBaseType>
-OccupiedGridMap<MapBaseType>::OccupiedGridMap( int sizeX_, int sizeY_, float cellLength_ ) : MapBaseType( sizeX_, sizeY_, cellLength_ ), currUpdateIndex( 0 )
+OccupiedGridMap<MapBaseType>::OccupiedGridMap( int sizeX_, int sizeY_, float cellLength_ ) : MapBaseType( sizeX_, sizeY_, cellLength_ ), currUpdateIndex( 0 ), currMarkOccIndex(-1), currMarkFreeIndex(-1)
 {
 
 }
 
 template<typename MapBaseType>
-OccupiedGridMap<MapBaseType>::OccupiedGridMap( const MapInfo &mapInfo ) : MapBaseType( mapInfo ), currUpdateIndex(0)
+OccupiedGridMap<MapBaseType>::OccupiedGridMap( const MapInfo &mapInfo ) : MapBaseType( mapInfo ), currUpdateIndex(0), currMarkOccIndex(-1), currMarkFreeIndex(-1)
 {
 
 }
 
 template<typename MapBaseType>
 OccupiedGridMap<MapBaseType>::OccupiedGridMap( const OccupiedGridMap &rhs ): MapBaseType( rhs ),
-									    currUpdateIndex( rhs.currUpdateIndex )
+									    currUpdateIndex( rhs.currUpdateIndex ),
+	currMarkOccIndex(rhs.currMarkOccIndex), currMarkFreeIndex(rhs.currMarkFreeIndex)
 {
 
 } 
@@ -81,7 +84,9 @@ OccupiedGridMap<MapBaseType>& OccupiedGridMap<MapBaseType>::operator=( const Occ
 	}
 
 	currUpdateIndex = rhs.currUpdateIndex;
-
+	currMarkOccIndex = rhs.currMarkOccIndex;
+	currMarkFreeIndex = rhs.currMarkFreeIndex;
+	
 	this->MapBaseType::operator=( rhs );
 
 	return *this;	
@@ -178,10 +183,10 @@ void OccupiedGridMap<MapBaseType>::bresenhamCellFree( int index )
 {
 	GridCell &cell = this->getCell( index );	
 	
-	if( cell.updateIndex < currUpdateIndex ){
+	if( cell.updateIndex < currMarkFreeIndex ){
 		this->setCellFree( index );
 		
-		cell.updateIndex = currUpdateIndex; // avoid reUpdate
+		cell.updateIndex = currMarkFreeIndex; // avoid reUpdate
 	}
 }
 
@@ -190,10 +195,13 @@ void OccupiedGridMap<MapBaseType>::bresenhamCellOccupied( int index )
 {
 	GridCell &cell = this->getCell( index );
 	
-	if( cell.updateIndex < currUpdateIndex ){
+	if( cell.updateIndex < currMarkOccIndex ){
+		if( cell.updateIndex == currMarkFreeIndex ){
+			this->setCellUnFree();	
+		}
                 this->setCellOccupied( index );
 
-                cell.updateIndex = currUpdateIndex; // avoid reUpdate
+                cell.updateIndex = currMarkOccIndex; // avoid reUpdate
         }
 
 }
@@ -203,10 +211,10 @@ void OccupiedGridMap<MapBaseType>::bresenhamCellFree( int mapX, int mapY )
 {
         GridCell &cell = this->getCell( mapX, mapY );
 	
-	if( cell.updateIndex < currUpdateIndex ){
+	if( cell.updateIndex < currMarkFreeIndex ){
                 this->setCellFree( mapX, mapY );
 
-                cell.updateIndex = currUpdateIndex; // avoid reUpdate
+                cell.updateIndex = currMarkFreeIndex; // avoid reUpdate
         }
 
 }
@@ -216,10 +224,13 @@ void OccupiedGridMap<MapBaseType>::bresenhamCellOccupied( int mapX, int mapY )
 {
 	GridCell &cell = this->getCell( mapX, mapY );
 
-        if( cell.updateIndex < currUpdateIndex ){
+        if( cell.updateIndex < currMarkOccIndex ){
+		if( cell.updateIndex == currMarkFreeIndex ){
+			this->setCellUnFree( mapX, mapY );
+		}
                 this->setCellOccupied( mapX, mapY );
 
-                cell.updateIndex = currUpdateIndex; // avoid reUpdate
+                cell.updateIndex = currMarkOccIndex; // avoid reUpdate
         }
 
 }
@@ -293,8 +304,10 @@ void OccupiedGridMap<MapBaseType>::updateByScan_test( ScanContainer &points, Eig
 template<typename MapBaseType>
 void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld )
 {
-        currUpdateIndex ++;
-
+        //currUpdateIndex ++;
+	currMarkFreeIndex = currUpdateIndex + 1;
+	currMarkOccIndex = currUpdateIndex + 2;
+	
         // 1. Transform robot Pose In world Coordinate to Map Coordinate
         Eigen::Vector3f robotPoseInMap = this->robotPoseWorld2Map( robotPoseInWorld );
         std::cout<<"Robot Pose In Map Coordinate: "<<std::endl;
@@ -328,6 +341,8 @@ void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::V
                         this->inverseModel( scanBeginMapI, scanEndInMapI );
                 }
         }
+	
+	currUpdateIndex += 3;
 
 }
 

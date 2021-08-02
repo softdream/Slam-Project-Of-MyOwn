@@ -2,6 +2,28 @@
 #include "laserSimulation.h"
 #include <unistd.h>
 
+void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
+{
+        size_t size = 1440;
+
+        float angle = -3.14159f;
+        container.clear();
+
+        for( int i = 0; i < size; i ++ ){
+                float dist = scan.ranges[ i ];
+
+                if( dist >= 0.0099999998f && dist <= 25.0000000000f ){
+                        //dist *= scaleToMap;
+                        container.addData( Eigen::Vector2f( cos(angle) * dist, sin(angle) * dist ) );
+                }
+
+                angle += 0.0043633231f;
+        }
+
+        std::cout<<"Scan Container Size: "<<container.getSize()<<std::endl;
+}
+
+
 int main()
 {
 	std::cout<<"--------------------- SLAM Simulation --------------------"<<std::endl;
@@ -28,7 +50,7 @@ int main()
 	cv::imshow("map", image);
 	
 	// open the simulation file
-	std::string file_name = "laser_data2.txt";
+	std::string file_name = "laser_data.txt";
 	simulation.openSimulationFile( file_name );
 
 	// convarince
@@ -42,47 +64,33 @@ int main()
 	// while it is not the end of the simulation file
 	int count = 0;
 	while( !simulation.endOfFile() ){
-//	while( count < 21 ){
 		// 1. get the laser data
 		slam::sensor::LaserScan scan;
-		scan.angle_min = -3.12414f;
-		scan.angle_max = 3.14159f;
-		scan.angle_increment = 0.0174532924f;
-		scan.range_min = 0.1500000060f;
-		scan.range_max = 12.0000000000f;
 	
 		slam::ScanContainer scanContainer;
 		simulation.readAFrameData( scan ); // read the laser data
 		
-		slam.laserData2Container( scan, scanContainer );// convert the laser data to scanContainer type	
+		laserData2Container( scan, scanContainer );// convert the laser data to scanContainer type	
 	
 		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;	
-
-		// 2. if this is the first frame of laser data
-		if( simulation.getFrameCount() < 20 ){
-			//Eigen::Vector3f robotPose( 0.0f, 0.0f, 0.0f );
-			// Process the first laser scan
+		if( simulation.getFrameCount() <= 10  ){
 			slam.processTheFirstScan( robotPosePrev, scanContainer );
-			std::cout<<"---------------- Process The First Laser Scan --------------------"<<std::endl;		
-	
-			// display the map
-			slam.displayMap( image );
 		}
-		else{	
-			// 3. Update by Scan Match, get the estimated pose 
+		else{
+	
+			// 1. Update by Scan Match, get the estimated pose 
 			slam.update( robotPosePrev, scanContainer );
 		
-			// 4. get the newest robot pose in world coordinate
+			// 2. get the newest robot pose in world coordinate	
 			robotPosePrev = slam.getLastScanMatchPose();
 			std::cout<<"robot pose now: "<<std::endl;
 			std::cout<<robotPosePrev<<std::endl;
 			std::cout<<"------------------"<<std::endl;
-		
-			// 4. display the map
-			slam.displayMap( image );
 		}
-		cv::waitKey(50);	
-	//	sleep(1);
+		// 3. display the map
+		slam.displayMap( image );
+		
+		cv::waitKey(5);	
 		count ++;
 	}
 		

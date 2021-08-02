@@ -53,7 +53,7 @@ bool Simulation::readAFrameData( slam::sensor::LaserScan &scan )
                                 //std::cout << num << "\t";
                                 //iss >> scan[count].range[i];
                                 if (!num.compare("inf")) {
-                                        scan.ranges[i] = 65536;
+                                        scan.ranges[i] = 65536.0f;
                                 }
                                 else{
                                         scan.ranges[i] = std::stof( num );

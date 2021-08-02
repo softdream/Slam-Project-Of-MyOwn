@@ -54,6 +54,9 @@ public:
 	void setCellOccupied( int mapX, int mapY );
 	void setCellFree( int index );
 	void setCellFree( int mapX, int mapY );
+	
+	void setCellUnFree( int index );
+	void setCellUnFree( int mapX, int mapY );
 
 	float getCellOccupiedProbability( int index ) const;
 	float getCellOccupiedProbability( int mapX, int mapY ) const;
@@ -342,6 +345,19 @@ void GridMapBase<CellType, CellOperations>::setCellFree( int mapX, int mapY )
         //cellOperate.setCellFree( cell );
 	return cellOperate.setCellFree(  this->getCell( mapX, mapY ));
 }	
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setCellUnFree( int index )
+{
+	return cellOperate.setCellUnFree( this->getCell( index ) );
+}
+
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setCellUnFree( int mapX, int mapY )
+{
+	return cellOperate.setCellUnFree( this->getCell( mapX, mapY ) );
+}
+
 
 template<typename CellType, typename CellOperations>
 float GridMapBase<CellType, CellOperations>::getCellOccupiedProbability( int index ) const
