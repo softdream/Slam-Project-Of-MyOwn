@@ -104,7 +104,7 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>3. Scan To SubMap的方法：与Scan To Map方法不同，Scan To SubMap方法只将当前帧激光雷达数据与历史前几帧数据进行匹配，而不是所有历史帧进行匹配。
   >>4. CSM + 分支限界法：相关性扫描匹配(Correlation Scan Matching, CSM)方法即暴力匹配方法，在一个搜索窗口对所有激光点数据进行暴力匹配，为降低匹配时间，采用分支限界法对搜索窗口进行剪枝，减少匹配次数。谷歌开源的cartographer即采用此种方法并且结合了scan to submap方法。<br>
   >>5. DNT方法：正态分布变换(Normal Distribution Transformation)。<br>
-  >>本项目采用Scan To Map的方法。参考开源项目hector slam。
+ 本项目采用Scan To Map的方法。参考开源项目hector slam。
   
 ### 3.3 SLAM后端
 #### 3.3.1 回环检测方法(待验证)
