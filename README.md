@@ -4,14 +4,20 @@
 ## 1. 开发环境
 操作系统:
 ```shell
-ubuntu16.04
+ubuntu16.04或以上版本
 ```
 第三方库:
 ```shell
-Opencv3.4.11
-Eigen2.0
+Opencv3.4.11或以上版本
+Eigen2.0或以上版本
 ```
 请确保计算机正常安装以上两个库。
+
+编译环境:
+```shell
+cmake3.5.1或以上版本
+g++5.1或以上版本
+```
 
 ## 2. 使用方法
 ### 2.1 生成静态链接库和动态链接库
@@ -103,8 +109,8 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>2. Scan To Map的方法：和ICP方法不同，当前帧的激光雷达扫描数据与已建好的历史占据栅格地图进行匹配，根据激光雷达观测点在地图上占据栅格的概率值的和来建立误差方程，使用高斯牛顿法求解方程使得占据概率值的和最大，得到最佳的机器人位姿坐标变换。此外还使用了双线性插值方法来计算当前帧激光雷达数据在地图上对应点的占据概率，提高匹配精准度。<br>
   >>3. Scan To SubMap的方法：与Scan To Map方法不同，Scan To SubMap方法只将当前帧激光雷达数据与历史前几帧数据进行匹配，而不是所有历史帧进行匹配，谷歌开源的cartographer使用了此方法并使用了双三次插值方法提高精准度。
   >>4. CSM + 分支限界法：相关性扫描匹配(Correlation Scan Matching, CSM)方法即暴力匹配方法，在一个搜索窗口对所有激光点数据进行暴力匹配，为降低匹配时间，采用分支限界法对搜索窗口进行剪枝，减少匹配次数。谷歌开源的cartographer即采用此种方法来做回环检测。<br>
-  >>5. DNT方法：正态分布变换(Normal Distribution Transformation)。<br>
- 本项目采用Scan To Map的方法。这一块参考了开源项目hector slam。
+  >>5. NDT方法：正态分布变换(Normal Distribution Transformation)。<br>
+ 本项目采用Scan To Map的方法。参考了开源项目hector slam。
   
 ### 3.3 SLAM后端
 #### 3.3.1 回环检测方法(待验证)
