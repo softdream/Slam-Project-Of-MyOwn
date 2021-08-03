@@ -153,24 +153,30 @@ void SlamProcessor::laserData2Container( const slam::sensor::LaserScan &scan, sl
 	std::cout<<"------------------ Laser Data To Container -----------------"<<std::endl;
 	container.clear();
 
-	float theta =  -3.12414f ;
-	//float theta = -std::fabs( scan.angle_min );
-	//std::cout<<"theta = "<<theta<<std::endl;
-	
+	//float theta =  -3.12414f ;
+	float theta = -std::fabs( scan.angle_min );
+#ifdef TERMINAL_LOG
+	std::cout<<"theta = "<<theta<<std::endl;
+#endif	
+
 	for( int i = 0; i < scan.size(); ++ i ){
 		float dist = scan.ranges[ i ];
-	//	std::cout<<"distance = "<<dist<<std::endl;		
 
-		//if( dist >= scan.range_min && dist <= scan.range_max ){
-		if( dist >= 0.1f && dist <= 12.0f ){
+#ifdef TERMINAL_LOG
+		std::cout<<"distance = "<<dist<<std::endl;		
+#endif
+		if( dist >= scan.range_min && dist <= scan.range_max ){
+		//if( dist >= 0.1f && dist <= 12.0f ){
 			Eigen::Vector2f point( ::cos( theta ) * dist, ::sin( theta ) * dist );
-//			std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
-			
+
+#ifdef TERMINAL_LOG
+			std::cout<<"laser point: ( "<<point[0]<<", "<<point[1]<<" )"<<std::endl;
+#endif	
 			container.addData( point );
 		}
 		
-	//	theta += std::fabs( scan.angle_increment );
-		theta += std::fabs( 0.0174533f );
+		theta += std::fabs( scan.angle_increment );
+		//theta += std::fabs( 0.0174533f );
 	}
 	
 	 std::cout<<"Scan Container Size: "<<container.getSize()<<std::endl;
@@ -208,15 +214,20 @@ void SlamProcessor::displayMap( cv::Mat &image )
 		for( int j = 0; j < occupiedGridMap->getSizeY(); j ++ ){
 			if( occupiedGridMap->isCellFree( i, j ) ){
                                 cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(255, 255, 255), 1);
-                                //std::cout<<"Free Point: ( "<<i<<", "<<j<<" )"<<std::endl;
-                                //std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+                        
+#ifdef TERMINAL_LOG
+			        std::cout<<"Free Point: ( "<<i<<", "<<j<<" )"<<std::endl;
+                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+#endif
                         }
                         else if( occupiedGridMap->isCellOccupied( i, j ) ){
                                 occupiedCount ++;
-                                //std::cout<<"Occupied Point: ( "<<i<<", "<<j<<" )"<<std::endl;
-                                //std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
-                                //std::cout<<"log Odds value: "<<occumap.getCellLogOdds(i, j)<<std::endl;
-                                cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), 1);
+#ifdef TERMINAL_LOG
+	                        std::cout<<"Occupied Point: ( "<<i<<", "<<j<<" )"<<std::endl;
+                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+                                std::cout<<"log Odds value: "<<occumap.getCellLogOdds(i, j)<<std::endl;
+#endif
+				cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), 1);
                         }
 
 		}
