@@ -1,9 +1,0 @@
-#include <iostream>
-#include "IMUCalibration.h"
-
-int main()
-{
-	std::cout<<"----------- IMU Calibration ---------------"<<std::endl;
-
-	return 0;
-}

@@ -1,0 +1,4 @@
+/home/riki/Test/mySlam2/slam_cmake_project/build/CMakeFiles/edit_cache.dir
+/home/riki/Test/mySlam2/slam_cmake_project/build/CMakeFiles/rebuild_cache.dir
+/home/riki/Test/mySlam2/slam_cmake_project/build/CMakeFiles/slam_static.dir
+/home/riki/Test/mySlam2/slam_cmake_project/build/CMakeFiles/slam.dir
