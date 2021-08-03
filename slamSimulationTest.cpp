@@ -12,7 +12,7 @@ void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContain
         for( int i = 0; i < size; i ++ ){
                 float dist = scan.ranges[ i ];
 
-                if( dist >= 0.0099999998f && dist <= 25.0000000000f ){
+                if( dist >= 0.0099999998f && dist <= 15.0000000000f ){
                         //dist *= scaleToMap;
                         container.addData( Eigen::Vector2f( cos(angle) * dist, sin(angle) * dist ) );
                 }
