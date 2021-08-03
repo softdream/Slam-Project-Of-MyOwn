@@ -57,21 +57,28 @@ OccupiedGridMap<MapBaseType>::OccupiedGridMap() : MapBaseType(), currUpdateIndex
 }
 
 template<typename MapBaseType>
-OccupiedGridMap<MapBaseType>::OccupiedGridMap( int sizeX_, int sizeY_, float cellLength_ ) : MapBaseType( sizeX_, sizeY_, cellLength_ ), currUpdateIndex( 0 ), currMarkOccIndex(-1), currMarkFreeIndex(-1)
+OccupiedGridMap<MapBaseType>::OccupiedGridMap( int sizeX_, int sizeY_, float cellLength_ ) : MapBaseType( sizeX_, sizeY_, cellLength_ ), 
+											     currUpdateIndex( 0 ), 
+											     currMarkOccIndex(-1), 
+											     currMarkFreeIndex(-1)
 {
 
 }
 
 template<typename MapBaseType>
-OccupiedGridMap<MapBaseType>::OccupiedGridMap( const MapInfo &mapInfo ) : MapBaseType( mapInfo ), currUpdateIndex(0), currMarkOccIndex(-1), currMarkFreeIndex(-1)
+OccupiedGridMap<MapBaseType>::OccupiedGridMap( const MapInfo &mapInfo ) : MapBaseType( mapInfo ), 
+									  currUpdateIndex(0), 
+									  currMarkOccIndex(-1), 
+									  currMarkFreeIndex(-1)
 {
 
 }
 
 template<typename MapBaseType>
 OccupiedGridMap<MapBaseType>::OccupiedGridMap( const OccupiedGridMap &rhs ): MapBaseType( rhs ),
-									    currUpdateIndex( rhs.currUpdateIndex ),
-	currMarkOccIndex(rhs.currMarkOccIndex), currMarkFreeIndex(rhs.currMarkFreeIndex)
+									     currUpdateIndex( rhs.currUpdateIndex ),
+									     currMarkOccIndex(rhs.currMarkOccIndex), 
+									     currMarkFreeIndex(rhs.currMarkFreeIndex)
 {
 
 } 
@@ -301,9 +308,42 @@ void OccupiedGridMap<MapBaseType>::updateByScan_test( ScanContainer &points, Eig
 	
 }
 
-template<typename MapBaseType>
+tmplate<typename MapBaseType>
 void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld )
 {
+	// P(m | x_1:t, z_1:t)
+	// m = { m1, m2, ..., m_n }
+	// P(m | x_1:t, z_1:t) = P(m1, m2, ..., m_n | x_1:t, z_1:t)
+	// Pi(i = 1 to n){ P(m_i | x_1:t, z_1:t) }
+	//
+	// grid occupied probability: 
+	// bel_t(m_i) = P( m_i | x_1:t, z_1:t )
+	// 	      = { P( z_t | m_i, x_1:t, z_1:t-1 ) * P( m_i | x_1:t, z_1:t-1 ) } / P( z_t | x_1:t, z_1:t-1 ) 
+	//	      = { P( z_t | m_i, x_t ) * P( m_i | x_1:t-1, z_1:t-1 ) } / P( z_t | x_1:t, z_1:t-1 ) 
+	// 	      = { P( m_i | z_t, x_t ) * P( z_t | x_t ) * P( m_i | x_1:t-1, z_1:t-1 ) } / { P( m_i | x_t ) * P( z_t | x_1:t, z_1:t-1 ) }
+	// 	      = { P( m_i | z_t, x_t ) * P( z_t | x_t ) * P( m_i | x_1:t-1, z_1:t-1 ) } / { P( m_i ) * P( z_t | x_1:t, z_1:t-1 ) } 
+	// 	      = { P( m_i | z_t, x_t ) * P( z_t | x_t ) * bel_t-1(m_i) } / { P( m_i ) * P( z_t | x_1:t, z_1:t-1 ) }
+	//
+	// grid free probability:
+	// bel_t(~m_i) =  1 - bel_t(m_i)
+	//	       = { P( ~m_i | z_t, x_t ) * P( z_t | x_t ) * bel_t-1(~m_i) } / { P( ~m_i ) * P( z_t | x_1:t, z_1:t-1 ) }	
+	//
+	// bel_t(m_i) / bel_t(~m_i) = bel_t(m_i) / 1 - bel_t(m_i)
+	// 			    = { P( m_i | z_t, x_t ) * bel_t(m_i) * [ 1 - P(m_i) ] } / { [ 1 - P( m_i | z_t, x_t ) ] * [ 1 - bel_t(m_i) ] * p(m_i) }
+	//
+	// l_t,i = log{ bel_t(m_i) / 1 - bel_t(m_i) }
+	//	 = log{ P( m_i | z_1:t, x_1:t ) / { 1 - P( m_i | z_1:t, x_1:t ) } }
+	//
+	// inverse model:
+	// l_inv,i = log{ P( m_i | z_t, x_t ) / { 1 - P( m_i | z_t, x_t ) } }
+	// 
+	// Prior probability:
+	// l_0 = log{ P( m_i ) / { 1 - P( m_i ) } }
+	//
+	// l_t,i = l_t-1,i + l_inv,i - l_0
+	//
+	// bel_t(m_i) = 1 - { 1 / ( 1 + exp( l_t,i ) ) } 
+	
         //currUpdateIndex ++;
 	currMarkFreeIndex = currUpdateIndex + 1;
 	currMarkOccIndex = currUpdateIndex + 2;
