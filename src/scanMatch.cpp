@@ -59,6 +59,27 @@ float ScanMatchMethod::bilinearInterpolation( const OccupiedMap &occuMap, const 
 
 Eigen::Vector3f ScanMatchMethod::bilinearInterpolationWithDerivative( const OccupiedMap &occuMap, const Eigen::Vector2f &coords )
 {
+	// M(Pm) = (y-y0)/(y1-y0) * { [(x-x0)/(x1-x0)] * M(P11) + [(x1-x)/(x1-x0)] * M(P01) }
+	//	  +(y1-y)/(y1-y0) * { [(x-x0)/(x1-x0)] * M(P10) + [(x1-x)/(x1-x0)] * M(P00) }
+	// among them:
+	// y1 - y0 = 1
+	// x1 - x0 = 1
+	// x1 - x = 1 - ( x - x0 )
+	// y1 - y = 1 - ( y - y0 )
+	// 
+	// M(Pm) = (y-y0) * { (x-x0) * M(P11) + (1-(x-x0)) * M(P01) } 
+	//	  +(1-(y-y0)) * { (x-x0) * M(P10) + (1-(x-x0)) * M(P00) }
+	//
+	// dM(Pm)/dx = (y-y0)/(y1-y0) * { M(P11) - M(P01) }
+	//	      +(y1-y)/(y1-y0) * { M(P10) - M(P00) }
+	//	     = (y-y0) * { M(P11) - M(P01) } + (1-(y-y0)) * { M(P10) - M(P00) }
+	//
+	// dM(Pm)/dy = (x-x0)/(x1-x0) * { M(P11) - M(P10) }
+        //            +(x1-x)/(x1-x0) * { M(P01) - M(P00) }
+	//	     = (x-x0) * { M(P11) - M(P10) } + (1-(x-x0)) * { M(P01) - M(P00) }
+	//
+	// dM(Pm)/dPm = { dM(Pm)/dx, dM(Pm)/dy }
+
 	// 1. judge weather out of range
         if( occuMap.isPointOutOfRange( coords ) ){
                 return Eigen::Vector3f( 0.0f, 0.0f, 0.0f );
@@ -66,8 +87,11 @@ Eigen::Vector3f ScanMatchMethod::bilinearInterpolationWithDerivative( const Occu
 
         // 2. map coords are always positive, floor them by casting to int
         Eigen::Vector2i indMin( coords.cast<int>() );
-//	std::cout<<"intergerMin = "<<std::endl<<indMin<<std::endl;
-	
+
+#ifdef TERMINAL_LOG
+	std::cout<<"intergerMin = "<<std::endl<<indMin<<std::endl;
+#endif
+
         // 3. factor0 = ( x - x0 )
         //    factor1 = ( y - y0 )
         float factor0 = coords[0] - static_cast<float>( indMin[0] );
@@ -79,20 +103,28 @@ Eigen::Vector3f ScanMatchMethod::bilinearInterpolationWithDerivative( const Occu
 
         // 5. get the probability of the four points
         mP00 = occuMap.getCellOccupiedProbability( index );
-//	std::cout<<"Mp(00) = "<<mP00<<std::endl;	
 
+#ifdef TERMINAL_LOG
+	std::cout<<"Mp(00) = "<<mP00<<std::endl;	
+#endif
         index ++;
         mP10 = occuMap.getCellOccupiedProbability( index );
-//	std::cout<<"Mp(10) = "<<mP10<<std::endl;
 
+#ifdef TERMINAL_LOG
+	std::cout<<"Mp(10) = "<<mP10<<std::endl;
+#endif
         index += sizeX - 1;
         mP01 = occuMap.getCellOccupiedProbability( index );
-//	std::cout<<"Mp(01) = "<<mP01<<std::endl;
 
+#ifdef TERMINAL_LOG
+	std::cout<<"Mp(01) = "<<mP01<<std::endl;
+#endif
         index ++;
         mP11 = occuMap.getCellOccupiedProbability( index );
-//	std::cout<<"Mp(11) = "<<mP11<<std::endl;
 
+#ifdef TERMINAL_LOG
+	std::cout<<"Mp(11) = "<<mP11<<std::endl;
+#endif
         // 6. factorInv0 = 1 - ( x - x0 )
         //    factorInv1 = 1 - ( y - y0 )
         float factorInv0 = 1.0f - factor0;
@@ -117,6 +149,25 @@ void ScanMatchMethod::getHessianDerivative( const OccupiedMap &occuMap,
                                    	    Eigen::Matrix3f &H,  
                                    	    Eigen::Vector3f &dTr )
 {
+	// H = Sigma(i = 1 to n){ Nabla( Si(cauchy) ) * [( d(Si(cauchy)) )/( d(cauchy) )] }^2
+	// n is the number of the scan points
+	//
+	// Si(cauchy) = | cosRot -sinRot | * | x_i | + | Px |
+	// 		| sinRot  cosRot |   | y_i |   | Py |
+	//
+	// among them:
+	// ( x_i, y_i ) is the point that lidar has observed in map coordinate, i = 0, 1, 2, ..., n;
+	// ( Px, Py ) is the Translation vector
+	// | cosRot -sinRot | 
+	// | sinRot  cosRot | is the Rotation Matrix
+	//
+	// d(Si(cauchy)) / d(cauchy) = | 1	0	-sinRot * x_i - cosRot * y_i |
+	//			       | 0	1	 cosRot * x_i - sinRot * y_i |
+	//
+	// Nabla( Si(cauchy) = dM(Pm)/dPm = { dM(Pm)/dx, dM(Pm)/dy }
+	//
+	// dTr = Sigma(i = 1 to n){ Nabla( Si(cauchy) ) * [( d(Si(cauchy)) )/( d(cauchy) )] } * { 1 - M( Si(cauchy) ) }
+
 	int size = scanPoints.getSize();
 
 	float sinRot = ::sin( robotPoseInWorld[2] );
@@ -200,9 +251,14 @@ bool ScanMatchMethod::estimateTransformationOnce( const OccupiedMap &occuMap,
 #endif
 
 	if ( ( H(0, 0) != 0.0f ) && ( H(1, 1) != 0.0f ) ){
+
+		// delta(cauchy) = H.inverse() * dTr;
 		Eigen::Vector3f deltaCauchy( H.inverse() * dTr );
-//		std::cout<<"delata Cauchy: "<<std::endl<<deltaCauchy<<std::endl;
-		
+
+#ifdef TERMINAL_LOG
+		std::cout<<"delata Cauchy: "<<std::endl<<deltaCauchy<<std::endl;
+#endif		
+
 		if( deltaCauchy[2] > 0.2f ){
 			deltaCauchy[2] = 0.2f;
 			std::cout<<"delta Cauchy angle change too large"<<std::endl;
@@ -225,6 +281,7 @@ void ScanMatchMethod::updateEstimatedPose( const OccupiedMap &occuMap, Eigen::Ve
 {
 	Eigen::Vector3f estimateInMap( occuMap.robotPoseWorld2Map( estimateInWorld ) );
 
+	// pose[t_time] = pose[(t - 1)_time] + delta( cauchy );
 	estimateInMap += delta;
 	
 	estimateInWorld = occuMap.robotPoseMap2World( estimateInMap );
