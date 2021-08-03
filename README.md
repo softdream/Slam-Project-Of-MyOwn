@@ -142,7 +142,7 @@ Create a new folder int the root directory of the project
 ```shell
 mkdir build 
 ```
-Go into the build folder and execute the command
+Go into the 'build' folder and execute the command
 ```shell
 cd ./build
 cmake ..
@@ -152,16 +152,16 @@ or
 cd ./build
 cmake -DLOGON=1 ..
 ```
-to view the log.
+to view the log.<br>
 Then execuate:
 ```shell
 make
 ```
-After that you can see two file in folder: build/lib
+After that you can see two files in folder: build/lib
 ```shell
 libslam.a libslam.so
 ```
-You can use the lib file in your own project now.
+You can use the lib files in your own project now.
 
 ## 2.2 How to use the demo to mapping
 First go into the 'test' folder and make a new folder named 'build':
