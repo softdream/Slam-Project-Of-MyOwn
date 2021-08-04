@@ -106,8 +106,8 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>由于激光雷达测量值较为准确，因此几乎所有的SLAM方案中都会使用激光雷达测量值来对机器人进行位姿估计。位姿估计的过程称之为扫描匹配(Scan Matching)。<br>
   >>常见的扫描匹配方法有：<br>
   >>1. Scan To Scan的方法：迭代最近点算法(Iterative Closest Point, ICP)，只对当前帧的激光雷达扫描数据与上一帧的数据进行匹配，根据两帧数据间所有点与点之间的欧氏距离和来建立误差方程，使用高斯牛顿法或者奇异值分解(SVD)方法求解方程使得距离和最小，得到最佳的机器人位姿坐标变换。<br>
-  >>2. Scan To Map的方法：和ICP方法不同，当前帧的激光雷达扫描数据与已建好的历史占据栅格地图进行匹配，根据激光雷达观测点在地图上占据栅格的概率值的和来建立误差方程，使用高斯牛顿法求解方程使得占据概率值的和最大，得到最佳的机器人位姿坐标变换。此外还使用了双线性插值方法来计算当前帧激光雷达数据在地图上对应点的占据概率，提高匹配精准度。<br>
-  >>3. Scan To SubMap的方法：与Scan To Map方法不同，Scan To SubMap方法只将当前帧激光雷达数据与历史前几帧数据进行匹配，而不是所有历史帧进行匹配，谷歌开源的cartographer使用了此方法并使用了双三次插值方法提高精准度。
+  >>2. Scan To Map的方法：和ICP方法不同，当前帧的激光雷达扫描数据与已建好的历史占据栅格地图进行匹配，根据激光雷达观测点在地图上占据栅格的概率值的和来建立误差方程，使用高斯牛顿法求解方程使得占据概率值的和最大，得到最佳的机器人位姿坐标变换。此外还使用了双线性插值方法(Bilinear Interpolation)来计算当前帧激光雷达数据在地图上对应点的占据概率，提高匹配精准度。<br>
+  >>3. Scan To SubMap的方法：与Scan To Map方法不同，Scan To SubMap方法只将当前帧激光雷达数据与历史前几帧数据进行匹配，而不是所有历史帧进行匹配，谷歌开源的cartographer使用了此方法并结合双三次插值(Bicubic Interpolation)方法提高精准度。
   >>4. CSM + 分支限界法：相关性扫描匹配(Correlation Scan Matching, CSM)方法即暴力匹配方法，在一个搜索窗口对所有激光点数据进行暴力匹配，为降低匹配时间，采用分支限界法对搜索窗口进行剪枝，减少匹配次数。谷歌开源的cartographer即采用此种方法来做回环检测。<br>
   >>5. NDT方法：正态分布变换(Normal Distribution Transformation)。<br>
  本项目采用Scan To Map的方法。参考了开源项目hector slam。
