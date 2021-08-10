@@ -58,6 +58,5 @@ struct KDTreeVectorOfVectorsAdaptor
 		return false;
 	}
 
-	/** @} */
 
 }; // end of KDTreeVectorOfVectorsAdaptor
