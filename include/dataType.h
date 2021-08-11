@@ -1,6 +1,8 @@
 #ifndef __Data_Type_H_
 #define __Data_Type_H_
 
+#include<string.h>
+
 namespace slam{
 
 namespace sensor{

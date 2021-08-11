@@ -54,7 +54,7 @@ private:
 		return angle * M_PI / 180.0;
 	}
 
-	const Eigen::MatrixXf circshift( Eigen::MatrixXf &_mat, int _num_shift );
+	const Eigen::MatrixXf circshift( const Eigen::MatrixXf &_mat, const int _num_shift );
 	const float cosineDistance( const Eigen::MatrixXf &_sc1, const Eigen::MatrixXf &_sc2 );
 	const int fastAlignUsingVkey( const Eigen::MatrixXf &_vkey1, const Eigen::MatrixXf &_vkey2);
 
@@ -174,7 +174,7 @@ void ScanContext<T, Dimension>::makeAndSaveScancontextAndKeys( const slam::senso
 }
 
 template<typename T, int Dimension>
-const Eigen::MatrixXf ScanContext<T, Dimension>::circshift( Eigen::MatrixXf &_mat, int _num_shift )
+const Eigen::MatrixXf ScanContext<T, Dimension>::circshift( const Eigen::MatrixXf &_mat, const int _num_shift )
 {
 	// shift columns to right direction 
     	assert(_num_shift >= 0);
@@ -279,7 +279,8 @@ template<typename T, int Dimension>
 const std::pair<int, float> ScanContext<T, Dimension>::detectLoopClosureID()
 {
 	int loop_id = -1;
-	auto curr_ring_key = ringKeys.back(); // current observation
+	//auto curr_ring_key = ringKeys.back(); // current observation
+	Eigen::Matrix<float, Dimension, 1> curr_ring_key = ringKeys.back();
 	auto curr_desc = scanContexts.back();	
 
 	// 1. candidates from ringkey tree_ 
