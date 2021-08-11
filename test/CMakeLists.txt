@@ -9,3 +9,5 @@ ADD_SUBDIRECTORY( icp_test )
 ADD_SUBDIRECTORY( scan_match_test )
 
 ADD_SUBDIRECTORY( slam_simulation_test )
+
+ADD_SUBDIRECTORY( scan_context_test )

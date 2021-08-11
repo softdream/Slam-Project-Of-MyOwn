@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 3.5.1 )
 
-ADD_DEFINITIONS( -std=c++11 )
+ADD_DEFINITIONS( -std=c++14 )
 
 #find required eigen
 FIND_PACKAGE( Eigen3 )
