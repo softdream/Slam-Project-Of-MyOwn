@@ -101,6 +101,9 @@ void DataContainer<DataType>::displayAFrameScan( const float scale ) const
 	cv::Point2d center( 300, 300 );
 	cv::circle(image, center, 1, cv::Scalar(0, 0, 255), 1);	
 
+	cv::line( image, cv::Point( 300, 0 ), cv::Point( 300, 600 ), cv::Scalar( 67, 128, 94 ), 1 );
+        cv::line( image, cv::Point( 0, 300 ), cv::Point( 600, 300 ), cv::Scalar( 67, 128, 94 ), 1 );
+
 	for( auto it : dataVec ){
 		cv::Point2d point( it(0) * scale + 300, it(1) * scale + 300 );
 		cv::circle(image, point, 1, cv::Scalar(0, 0, 255), 1);
