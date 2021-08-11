@@ -126,6 +126,10 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   
   >>3. Scan Context方法
   >>Scan Context方法是模仿模式匹配中的Shape Context方法来做的，最初是用来解决3D激光slam中的回环检测问题的。本项目对其进行改进，使其适用于2D激光slam当中。
+  >>一帧激光扫描数据如下所示:<br>
+  ![A frame of Scan](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/lidar_scan.png)<br>
+  >>将激光扫描帧转化为Scan Context效果如下：
+   ![A frame of Scan Context](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/scan_context.png)<br>
  
 #### 3.3.2 图优化方法(未完成)
   >>图优化的目的是从整体上对所有已估计到的并且在回环上的位姿进行优化，减小误差。图优化的思路是将位姿作为图(Graph)的顶点(Vertex),位姿间的坐标变换关系作为边(Edge), 顶点为优化变量，边为优化约束，构建出一个位姿图(Pose Graph)。有些时候需要将雷达观测点也作为图的顶点，观测点与机器人的位姿之间的关系也作为边构建出一个图，这种情况下称之为Bundle Adjustment(BA)问题，这里不做考虑。<br>
