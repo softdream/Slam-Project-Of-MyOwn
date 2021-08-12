@@ -22,6 +22,9 @@ public:
 	virtual void detectLoop( const slam::sensor::LaserScan &scan ) = 0;
 	virtual void caculateTransformByICP() = 0;
 	
+	virtual const Eigen::Matrix<float, 2, 2> getRotateMatrix() const  = 0;
+	virtual const Eigen::Vector2f getTransformVector() const = 0;
+	
 };
 
 }

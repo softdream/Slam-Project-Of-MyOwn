@@ -27,7 +27,28 @@ void ScanContextLoopClosure::detectLoop( const slam::sensor::LaserScan &scan )
 
 void ScanContextLoopClosure::caculateTransformByICP()
 {
+	ScanContainer pointsCandidate;
+	ScanContainer pointsNow;
+
+	sensor::LaserScan scanNow = scanVec.back();
+	sensor::LaserScan scanCandidate = scanVec[ matchedScanID ];
+
+	pointsCandidate.pointTransform2LaserCoords( scanCandidate ) ;
+	pointsNow.pointTransform2LaserCoords( scanNow );
+
+	float loss = icp.solveICP( pointsCandidate, pointsNow );
+	std::cout<<"loss = "<<loss<<std::endl;
 	
+}
+
+const Eigen::Matrix<float,2 ,2> ScanContextLoopClosure::getRotateMatrix() const 
+{
+	return icp.getRotateMatrix();
+}
+
+const Eigen::Vector2f ScanContextLoopClosure::getTransformVector() const
+{
+	return icp.getTransform();
 }
 
 }
