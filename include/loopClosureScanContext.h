@@ -18,6 +18,7 @@ public:
 	virtual const Eigen::Matrix<float, 2, 2> getRotateMatrix() const;
 	virtual const Eigen::Vector2f getTransformVector() const;
 
+	virtual void setPose( const Eigen::Vector3f &pose );
 private:
 	ICP icp;	
 

@@ -51,4 +51,9 @@ const Eigen::Vector2f ScanContextLoopClosure::getTransformVector() const
 	return icp.getTransform();
 }
 
+void ScanContextLoopClosure::setPose( const Eigen::Vector3f &pose )
+{
+
+}
+
 }

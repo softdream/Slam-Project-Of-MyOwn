@@ -25,6 +25,7 @@ public:
 	virtual const Eigen::Matrix<float, 2, 2> getRotateMatrix() const  = 0;
 	virtual const Eigen::Vector2f getTransformVector() const = 0;
 	
+	virtual void setPose( const Eigen::Vector3f &pose ) = 0;
 };
 
 }
