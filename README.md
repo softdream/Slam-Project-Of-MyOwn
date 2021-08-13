@@ -8,15 +8,20 @@ ubuntu16.04或以上版本
 ```
 第三方库:
 ```shell
-Opencv3.4.11或以上版本
-Eigen3.3.9或以上版本
+Opencv 3.4.11或以上版本
+Eigen 3.3.9或以上版本
 ```
 请确保计算机正常安装以上两个库。
 
 编译环境:
 ```shell
-cmake3.5.1或以上版本
-g++5.1或以上版本
+cmake 3.5.1或以上版本
+g++ 5.4.0或以上版本
+```
+
+语言标准：
+```shell
+C++14标准
 ```
 
 ## 2. 使用方法
@@ -117,12 +122,12 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>回环检测(Loop Closure Detection)是用来检测机器人有没有在某一时刻运动到之前到过的点，如果是则构成一个回环，一个回环是一个强约束，通常与图优化方法相结合，用来对回环上的所有位姿估计进行优化，消除累计误差。<br>
   >>2d激光slam的回环检测方法有：<br>
   >>1. 基于特征的匹配<br>
-  >>基于特征的匹配方法首先要求对激光雷达的观测数据进行特征提取(Feature Extraction)，由于是2维的建图，特征比较单一，完全没有视觉或者3d激光雷达的特征丰富，因此在特征提取这一阶段就很困难。一般有线特征，圆特征，直角特征等。<br>
+  >>基于特征的匹配方法首先要求对激光雷达的观测数据进行特征提取(Feature Extraction)，由于是2维的建图，特征比较单一，完全没有视觉或者3d激光雷达的特征丰富，因此在特征提取这一阶段就很困难。一般有线特征，圆特征，角点特征等。<br>
   >>特征的匹配，待续。
 
   >>2. 基于点的匹配
   >>基于点的匹配方法和scan matching的方法相同，这里不再赘述。<br>
-  >>采用icp方法来进行回环检测，思路是对于每两帧雷达扫描数据，定义一个损失函数(Loss Function)，固定使用牛顿高斯法迭代100次，Loss小于阈值的认为匹配成功，视为检测到了回环。
+  >>采用icp方法来进行回环检测，思路是将每一个估计到的位姿加入到KD树中，对于每一个新的激光帧到达时都估计出的新位姿，在KD树中查找是否有相近的位姿点，如果有则认为该点可能是回环点，再使用ICP算法进行精准匹配，确认是否是回环帧。对于候选帧雷达扫描数据和当前雷达扫描数据，定义一个损失函数(Loss Function)，固定使用牛顿高斯法迭代100次，Loss小于阈值的认为匹配成功，视为检测到了回环。
   
   >>3. Scan Context方法
   >>Scan Context方法是模仿模式匹配中的Shape Context方法来做的，最初是用来解决3D激光slam中的回环检测问题的。本项目对其进行改进，使其适用于2D激光slam当中。
@@ -141,13 +146,20 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
 ## 1.  Developement Environment
 Operating System:
 ```shell
-ubuntu16.04
+ubuntu 16.04
 ```
 Third-party Libraries:
 ```shell
-Opencv3.4.11
-Eigen2.0
+Opencv 3.4.11
+Eigen 3.3.9
 ```
+Compiling environment
+```shell
+cmake 3.5.1
+g++ 5.4.0
+```
+
+
 Please make sure you have installed the above two libraries successfully.
 
 ## 2. Usage
