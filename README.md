@@ -103,6 +103,8 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
 #### 3.2.1 概率占据栅格地图(已完成)
   >>一般在SLAM中地图的表示方法有很多种，有语义地图(The Semantic Map)，拓扑地图(The Topology Map)，占据栅格地图(Occupied Grid Map)。<br>
   >>本项目使用最常见的占据栅格地图，在占据栅格地图中，每一个栅格代表一个对应于现实世界中的在某个分辨率下的障碍物，使用占据率(Occupancy)来描述该栅格是障碍物的概率。<br>
+  ![A frame of Scan Context](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/occupiedMap.png)<br>
+  >>如图所示为一个占据栅格地图的例子，白色空间表示未占用，红色表示占用，黑色为未知空间。
   
 #### 3.2.2 地图构建方法(已完成)
   >>占据栅格地图的构建有很多方法，本项目采用经典的激光雷达反演观测模型(Inverse Observation Model)来构建每一帧地图。
