@@ -18,7 +18,7 @@ INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 
 
 # change this directory for required source file
-AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/scan_context_test test_src )
+AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/occupiedMap_test test_src )
 
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../include" )
 
@@ -28,8 +28,8 @@ LINK_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../build/lib/" )
 LINK_DIRECTORIES(${OpenCV_LIBRARY_DIRS})
 
 # executable file name
-ADD_EXECUTABLE( scanContext ${test_src} )
+ADD_EXECUTABLE( occupiedMap ${test_src} )
 
-TARGET_LINK_LIBRARIES( scanContext slam.a )
+TARGET_LINK_LIBRARIES( occupiedMap slam.a )
 
-TARGET_LINK_LIBRARIES( scanContext ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES( occupiedMap ${OpenCV_LIBS} )
