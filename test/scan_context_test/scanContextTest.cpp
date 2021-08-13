@@ -41,15 +41,25 @@ int main()
 	slam::sensor::LaserScan scan;
 	slam::ScanContainer scanContainer;
 
+	while( !simulation.endOfFile() ){	
+
 	// read a frame of data
-	simulation.readAFrameData( scan );	
-	laserData2Container( scan, scanContainer );// convert the laser data to scanContainer type
-	scanContainer.displayAFrameScan( 20.0f );
+		simulation.readAFrameData( scan );	
+		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;
 
-	Eigen::MatrixXf sc = scanContext.makeScanContext( scan );
-	scanContext.displayAScancontext( sc );
+		laserData2Container( scan, scanContainer );// convert the laser data to scanContainer type
+		scanContainer.displayAFrameScan( 20.0f );
 
-	cv::waitKey( 0 );	
+		Eigen::MatrixXf sc = scanContext.makeScanContext( scan );
+		scanContext.displayAScancontext( sc );
+		//scanContext.makeRingkeyFromScancontext( sc );
+		
+	//	scanContext.makeAndSaveScancontextAndKeys( scan );	
+	//	scanContext.detectLoopClosureID();	
+	
+		cv::waitKey( 60 );	
+	
+	}
 		
 	simulation.closeSimulationFile();
 
