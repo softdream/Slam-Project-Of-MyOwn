@@ -10,6 +10,9 @@ ADD_DEFINITIONS( -std=c++14 )
 # option of turning on the log or not
 OPTION( ONLOG "log on or off" OFF )
 
+set(G2O_USE_VENDORED_CERES ON CACHE BOOL "Use vendored Ceres from g2o/EXTERNAL/ceres")
+
+
 IF( ONLOG )
 	ADD_DEFINITIONS( -DTERMINAL_LOG )
 ENDIF( ONLOG )
