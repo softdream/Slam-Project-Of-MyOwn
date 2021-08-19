@@ -44,6 +44,8 @@ public:
 
 	void displayMap( cv::Mat &image ) ;
 
+	const Eigen::Vector3f getPoseDifferenceValue() const;
+
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 
@@ -63,6 +65,8 @@ private:
 	Eigen::Matrix3f covarianceMatrix;	
 	Eigen::Vector3f lastScanMatchPose;
 	Eigen::Vector3f lastMapUpdatePose;
+	
+	Eigen::Vector3f poseDiff;
 	
 	// ------------ opencv map -------------- //
 	//cv::Mat image;

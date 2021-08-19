@@ -116,6 +116,9 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 
 bool SlamProcessor::poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew )
 {
+	// get the difference value between old pose and new pose
+	poseDiff = poseNew - poseOld;
+
 	if( ( ( poseNew.head<2>() - poseOld.head<2>() ).norm() ) > minDistanceDiffForMapUpdate ){
 		return true;
 	}
@@ -237,6 +240,11 @@ void SlamProcessor::displayMap( cv::Mat &image )
         std::cout<<"Occupied Points Number: "<<occupiedCount<<std::endl;
 
         cv::imshow( "map", image );
+}
+
+const Eigen::Vector3f SlamProcessor::getPoseDifferenceValue() const
+{
+	return poseDiff;
 }
 
 }
