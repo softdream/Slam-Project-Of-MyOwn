@@ -24,7 +24,7 @@ typedef struct {
 }Laser;
 
 
-static int readLaserTXT(Laser *scan)
+static int readLaserTXT(std::string fileName, Laser *scan)
 {
 	int count = 0;
 	std::string input_file_name = "laser_data.txt";

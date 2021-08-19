@@ -168,7 +168,10 @@ void OccupiedGridMap<MapBaseType>::inverseModel( int x0, int y0, int x1, int y1 
 {
 	// 1. set the end point occupied first
 	bresenhamCellOccupied( x1, y1 );
+
+#ifdef TERMINAL_LOG
 	std::cout<<"Occupied Cell Pose In Map: ( "<< x1 <<", "<< y1<<" )"<<std::endl;
+#endif
 
 	// 2. execute the bresenham algorithm, find the points of free, and set them free
 	bresenHam( x0, y0, x1, y1 );
@@ -350,13 +353,19 @@ void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::V
 	
         // 1. Transform robot Pose In world Coordinate to Map Coordinate
         Eigen::Vector3f robotPoseInMap = this->robotPoseWorld2Map( robotPoseInWorld );
+
+#ifdef TERMINAL_LOG 
         std::cout<<"Robot Pose In Map Coordinate: "<<std::endl;
         std::cout<<robotPoseInMap<<std::endl;
+#endif
 
         // 2. Get the start point of the laser data in Map Coordinate
         Eigen::Vector2i scanBeginMapI( robotPoseInMap.head<2>().cast<int>() );
-        std::cout<<"Robot Pose In Map Coordinate(Interger): "<<std::endl;
+        
+#ifdef TERMINAL_LOG
+	std::cout<<"Robot Pose In Map Coordinate(Interger): "<<std::endl;
         std::cout<<scanBeginMapI<<std::endl;
+#endif
 
         size_t numberOfBeams = points.getSize();
         std::cout<<"Number Of Beams: "<<numberOfBeams<<std::endl;
@@ -364,7 +373,10 @@ void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::V
         for( size_t i = 0; i < numberOfBeams; i ++ ){
                 // 3. Get the End point of Every Laser Beam in Laser Coordinate
                 Eigen::Vector2f scanEndInLaser( points.getIndexData( i ) );
+
+#ifdef TERMINAL_LOG
                 std::cout<<"Occupied Point In World ( "<<scanEndInLaser[0]<<", "<<scanEndInLaser[1]<<" )"<<std::endl;
+#endif
 
                 // 4. Transform the End Point from Laser Coordinate to World Coordinate
                 Eigen::Vector2f scanEndInWorld( this->observedPointPoseLaser2World( scanEndInLaser, robotPoseInWorld ) );
