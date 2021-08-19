@@ -10,6 +10,8 @@ ubuntu16.04或以上版本
 ```shell
 Opencv 3.4.11或以上版本
 Eigen 3.3.9或以上版本
+g2o 
+https://github.com/RainerKuemmerle/g2o
 ```
 请确保计算机正常安装以上两个库。
 
@@ -112,10 +114,10 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
 #### 3.2.3 Scan To Map方法(已完成)
   >>由于激光雷达测量值较为准确，因此几乎所有的SLAM方案中都会使用激光雷达测量值来对机器人进行位姿估计。位姿估计的过程称之为扫描匹配(Scan Matching)。<br>
   >>常见的扫描匹配方法有：<br>
-  >>1. Scan To Scan的方法：迭代最近点算法(Iterative Closest Point, ICP)，只对当前帧的激光雷达扫描数据与上一帧的数据进行匹配，根据两帧数据间所有点与点之间的欧氏距离和来建立误差方程，使用高斯牛顿法或者奇异值分解(SVD)方法求解方程使得距离和最小，得到最佳的机器人位姿坐标变换。<br>
-  >>2. Scan To Map的方法：和ICP方法不同，当前帧的激光雷达扫描数据与已建好的历史占据栅格地图进行匹配，根据激光雷达观测点在地图上占据栅格的概率值的和来建立误差方程，使用高斯牛顿法求解方程使得占据概率值的和最大，得到最佳的机器人位姿坐标变换。此外还使用了双线性插值方法(Bilinear Interpolation)来计算当前帧激光雷达数据在地图上对应点的占据概率，提高匹配精准度。<br>
+  >>1. Scan To Scan的方法：<br>迭代最近点算法(Iterative Closest Point, ICP)，只对当前帧的激光雷达扫描数据与上一帧的数据进行匹配，根据两帧数据间所有点与点之间的欧氏距离和来建立误差方程，使用高斯牛顿法或者奇异值分解(SVD)方法求解方程使得距离和最小，得到最佳的机器人位姿坐标变换。<br>
+  >>2. Scan To Map的方法：<br>和ICP方法不同，当前帧的激光雷达扫描数据与已建好的历史占据栅格地图进行匹配，根据激光雷达观测点在地图上占据栅格的概率值的和来建立误差方程，使用高斯牛顿法求解方程使得占据概率值的和最大，得到最佳的机器人位姿坐标变换。此外还使用了双线性插值方法(Bilinear Interpolation)来计算当前帧激光雷达数据在地图上对应点的占据概率，提高匹配精准度。<br>
   >>3. Scan To SubMap的方法：与Scan To Map方法不同，Scan To SubMap方法只将当前帧激光雷达数据与历史前几帧数据进行匹配，而不是所有历史帧进行匹配，谷歌开源的cartographer使用了此方法并结合双三次插值(Bicubic Interpolation)方法提高精准度。
-  >>4. CSM + 分支限界法：相关性扫描匹配(Correlation Scan Matching, CSM)方法即暴力匹配方法，在一个搜索窗口对所有激光点数据进行暴力匹配，为降低匹配时间，采用分支限界法对搜索窗口进行剪枝，减少匹配次数。谷歌开源的cartographer即采用此种方法来做回环检测。<br>
+  >>4. CSM + 分支限界法：<br>相关性扫描匹配(Correlation Scan Matching, CSM)方法即暴力匹配方法，在一个搜索窗口对所有激光点数据进行暴力匹配，为降低匹配时间，采用分支限界法对搜索窗口进行剪枝，减少匹配次数。谷歌开源的cartographer即采用此种方法来做回环检测。<br>
   >>5. NDT方法：正态分布变换(Normal Distribution Transformation)。<br>
  本项目采用Scan To Map的方法。参考了开源项目hector slam。
   
@@ -127,11 +129,11 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>基于特征的匹配方法首先要求对激光雷达的观测数据进行特征提取(Feature Extraction)，由于是2维的建图，特征比较单一，完全没有视觉或者3d激光雷达的特征丰富，因此在特征提取这一阶段就很困难。一般有线特征，圆特征，角点特征等。<br>
   >>特征的匹配，待续。
 
-  >>2. 基于点的匹配
+  >>2. 基于点的匹配<br>
   >>基于点的匹配方法和scan matching的方法相同，这里不再赘述。<br>
   >>采用icp方法来进行回环检测，思路是将每一个估计到的位姿加入到KD树中，对于每一个新的激光帧到达时都估计出的新位姿，在KD树中查找是否有相近的位姿点，如果有则认为该点可能是回环点，再使用ICP算法进行精准匹配，确认是否是回环帧。对于候选帧雷达扫描数据和当前雷达扫描数据，定义一个损失函数(Loss Function)，固定使用牛顿高斯法迭代100次，Loss小于阈值的认为匹配成功，视为检测到了回环。
   
-  >>3. Scan Context方法
+  >>3. Scan Context方法<br>
   >>Scan Context方法是模仿模式匹配中的Shape Context方法来做的，最初是用来解决3D激光slam中的回环检测问题的。本项目对其进行改进，使其适用于2D激光slam当中。
   >>一帧激光扫描数据如下所示:<br>
   ![A frame of Scan](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/lidar_scan.png)<br>
