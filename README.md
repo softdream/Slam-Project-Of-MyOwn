@@ -11,8 +11,8 @@ ubuntu16.04或以上版本
 Opencv 3.4.11或以上版本
 Eigen 3.3.9或以上版本
 g2o 
-参考[g2o-General Graph Optimization](https://github.com/RainerKuemmerle/g2o)
 ```
+参考[g2o-General Graph Optimization](https://github.com/RainerKuemmerle/g2o)
 请确保计算机正常安装以上两个库。
 
 编译环境:
