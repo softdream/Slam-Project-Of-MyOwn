@@ -38,19 +38,22 @@ void GraphOptimize::addVertex( const Eigen::Vector3f &pose, const int id )
 	std::cout<<"add a vertex to the optimizer ..."<<std::endl;
 }
 
-void GraphOptimize::addEdge( const Eigen::Vector3f &delta )
+void GraphOptimize::addEdge( const Eigen::Vector3f &delta, 
+			     const int from, 
+                             const int to,  
+                             Eigen::Matrix3d &information )
 {
 	EdgeSE2 *edge = new EdgeSE2();
 	
-	//edge->vertices()[0] = optimizer.vertex( source_id );
-	//edge->vertices()[1] = optimizer.vertex( target_id );
+	edge->vertices()[0] = optimizer.vertex( from );
+	edge->vertices()[1] = optimizer.vertex( to );
 	
 	SE2 measurement( delta[0], delta[1], delta[2] );
 	edge->setMeasurement( measurement );
 
 	edge->setId( edgeCount );
 	
-	//edge->setInformation(  );
+	edge->setInformation( information );
 	
 	optimizer.addEdge( edge );
 

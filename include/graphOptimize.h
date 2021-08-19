@@ -31,7 +31,10 @@ public:
 	
 	void addVertex( const Eigen::Vector3f &pose, const int id );
 	
-	void addEdge( const Eigen::Vector3f &delta );
+	void addEdge(   const Eigen::Vector3f &delta, 
+			const int from, 
+			const int to,  
+			Eigen::Matrix3d &information );
 
 	int execuateGraphOptimization();
 	
