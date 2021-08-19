@@ -308,7 +308,7 @@ void OccupiedGridMap<MapBaseType>::updateByScan_test( ScanContainer &points, Eig
 	
 }
 
-tmplate<typename MapBaseType>
+template<typename MapBaseType>
 void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld )
 {
 	// P(m | x_1:t, z_1:t)
