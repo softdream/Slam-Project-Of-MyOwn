@@ -18,7 +18,7 @@ g2o的安装参考[g2o-General Graph Optimization](https://github.com/RainerKuem
 
 编译环境:
 ```shell
-cmake 3.5.1或以上版本
+cmake 3.9.1或以上版本
 g++ 5.4.0或以上版本
 ```
 
