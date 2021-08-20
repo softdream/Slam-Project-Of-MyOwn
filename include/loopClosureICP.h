@@ -28,6 +28,8 @@ public:
 
 	virtual void setPose( const Eigen::Vector3f &pose );
 
+	virtual int detectedALoop() const;
+	
 private:
 	ICP icp;
 	

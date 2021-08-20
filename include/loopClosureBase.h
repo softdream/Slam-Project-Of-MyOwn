@@ -26,6 +26,8 @@ public:
 	virtual const Eigen::Vector2f getTransformVector() const = 0;
 	
 	virtual void setPose( const Eigen::Vector3f &pose ) = 0;
+
+	virtual int detectedALoop() const = 0; 
 };
 
 }

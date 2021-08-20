@@ -16,7 +16,9 @@ void ICPLoopClosure::detectLoop( const slam::sensor::LaserScan &scan )
 {
 	scanVec.push_back( scan );
 	
-	int loop_id = -1;
+	//int loop_id = -1;
+	matchedScanID = -1;	
+
 	Eigen::Vector3f currPose = poseVec.back();
 	
 	if( poseVec.size() < NUM_EXCLUDE_RECENT + 1 ){
@@ -69,18 +71,20 @@ void ICPLoopClosure::detectLoop( const slam::sensor::LaserScan &scan )
 
 void ICPLoopClosure::caculateTransformByICP()
 {
-	ScanContainer pointsCandidate;
-        ScanContainer pointsNow;
+	if( matchedScanID != -1 ){
 
-        sensor::LaserScan scanNow = scanVec.back();
-        sensor::LaserScan scanCandidate = scanVec[ matchedScanID ];
+		ScanContainer pointsCandidate;
+	        ScanContainer pointsNow;
 
-        pointsCandidate.pointTransform2LaserCoords( scanCandidate ) ;
-        pointsNow.pointTransform2LaserCoords( scanNow );
+	        sensor::LaserScan scanNow = scanVec.back();
+        	sensor::LaserScan scanCandidate = scanVec[ matchedScanID ];
 
-        float loss = icp.solveICP( pointsCandidate, pointsNow );
-        std::cout<<"loss = "<<loss<<std::endl;
+	        pointsCandidate.pointTransform2LaserCoords( scanCandidate ) ;
+        	pointsNow.pointTransform2LaserCoords( scanNow );
 
+	        float loss = icp.solveICP( pointsCandidate, pointsNow );
+        	std::cout<<"loss = "<<loss<<std::endl;
+	}
 }
 
 
@@ -100,6 +104,10 @@ void ICPLoopClosure::setPose( const Eigen::Vector3f &pose )
 	poseVec.push_back( pose );
 }
 
+int ICPLoopClosure::detectedALoop() const 
+{
+	return ( matchedScanID );
+}
 
 
 }

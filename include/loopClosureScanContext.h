@@ -19,6 +19,8 @@ public:
 	virtual const Eigen::Vector2f getTransformVector() const;
 
 	virtual void setPose( const Eigen::Vector3f &pose );
+
+	virtual int detectedALoop() const;
 private:
 	ICP icp;	
 
