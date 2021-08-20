@@ -78,7 +78,7 @@ int main()
 	
 	//---------------- Input the first scan to initialize the map ----------------//
 	slam::ScanContainer laserPoints;
-	slam::simulation::readLaserTXT( scanArray );
+	slam::simulation::readLaserTXT( "laser_data.txt", scanArray );
 	
 	laserData2Container( scanArray[0], laserPoints );
 	

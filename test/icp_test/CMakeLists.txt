@@ -11,13 +11,25 @@ INCLUDE_DIRECTORIES( ${EIGEN3_INCLUDE_DIR} )
 
 SET( EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin" )
 
+#find required opencv
+FIND_PACKAGE( OpenCV REQUIRED )
+
+#directory of opencv headers
+INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
+
+
 AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/icp_test test_src )
 
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../include" )
 
 LINK_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../build/lib/" )
 
+#directory of opencv link libs
+LINK_DIRECTORIES(${OpenCV_LIBRARY_DIRS})
+
 ADD_EXECUTABLE( icpTest ${test_src} )
 
 TARGET_LINK_LIBRARIES( icpTest slam.a )
+
+TARGET_LINK_LIBRARIES( icpTest ${OpenCV_LIBS} )
 

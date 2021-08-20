@@ -32,7 +32,7 @@ int main()
   	slam::simulation::Laser scanArray[2];
   
   	slam::ScanContainer laserPoints[2];
-	slam::simulation::readLaserTXT( scanArray );
+	slam::simulation::readLaserTXT( "laser_data.txt", scanArray );
   
   	laserData2Container( scanArray[0], laserPoints[0] );
   	laserData2Container( scanArray[1], laserPoints[1] );

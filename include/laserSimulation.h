@@ -27,7 +27,7 @@ typedef struct {
 static int readLaserTXT(std::string fileName, Laser *scan)
 {
 	int count = 0;
-	std::string input_file_name = "laser_data.txt";
+	std::string input_file_name = fileName;
 	std::ifstream input_file(input_file_name.c_str(), std::ifstream::in);
 
 	if (!input_file.is_open()) {
