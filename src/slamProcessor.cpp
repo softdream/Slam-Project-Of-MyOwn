@@ -92,6 +92,9 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 			    ScanContainer &scanContainer,
 			    bool mapWithoutMatching )
 {
+	// a state variable for judging if this is a key scan frame
+	keyFrame = false;	
+
 	// 1. Pose Scan Match
 	Eigen::Vector3f newPoseEstimated;// estimated pose in world coordinate
 	
@@ -106,6 +109,9 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 	
 	// 2. Map Update
 	if( poseDiffLargerThan( lastMapUpdatePose, newPoseEstimated ) ){
+		// if pose change is greater than the threshold, then this is a Key scan Frame
+		keyFrame = true;
+
 		// update the map only when the pose change is greater than the threshol
 		occupiedGridMap->updateByScan( scanContainer, newPoseEstimated );
 		// occupiedGridMap->onMapUpdate();
@@ -245,6 +251,11 @@ void SlamProcessor::displayMap( cv::Mat &image )
 const Eigen::Vector3f SlamProcessor::getPoseDifferenceValue() const
 {
 	return poseDiff;
+}
+
+bool SlamProcessor::isKeyFrame() const
+{
+	return keyFrame;
 }
 
 }

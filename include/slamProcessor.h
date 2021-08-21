@@ -46,6 +46,8 @@ public:
 
 	const Eigen::Vector3f getPoseDifferenceValue() const;
 
+	bool isKeyFrame() const;
+
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 
@@ -70,6 +72,8 @@ private:
 	
 	// ------------ opencv map -------------- //
 	//cv::Mat image;
+	
+	bool keyFrame = false;
 }; 
 
 }
