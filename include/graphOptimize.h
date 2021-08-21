@@ -14,6 +14,8 @@
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
 
+#include <vector>
+
 namespace slam{
 	
 namespace optimizer{
@@ -43,6 +45,8 @@ private:
 	g2o::SparseOptimizer optimizer; // allocating the optimizer
 	
 	int edgeCount = 0;
+
+	std::vector<Eigen::Vector3f> estimatedPoses;
 };
 
 }
