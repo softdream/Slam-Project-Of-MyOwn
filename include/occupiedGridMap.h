@@ -34,6 +34,7 @@ public:
 	void updateByScan_test( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld );
 	
 	void updateByScan( ScanContainer &points, Eigen::Vector3f &robotPoseInWorld );
+	void resetGridMap();
 
 private:
 	void bresenHam( int x0, int y0, int x1, int y1 );
@@ -398,7 +399,11 @@ void OccupiedGridMap<MapBaseType>::updateByScan( ScanContainer &points, Eigen::V
 
 }
 
-
+template<typename MapBaseType>
+void OccupiedGridMap<MapBaseType>::resetGridMap()
+{
+	return this->clear();
+}
 
 }
 

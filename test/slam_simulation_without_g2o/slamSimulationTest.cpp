@@ -1,10 +1,5 @@
 #include "slamProcessor.h"
 #include "laserSimulation.h"
-
-#include "loopClosureScanContext.h"
-
-#include "graphOptimize.h"
-
 #include <unistd.h>
 
 void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
@@ -38,12 +33,6 @@ int main()
 	slam::simulation::Simulation simulation;
 	slam::MapInfo mapInfo = slam.getMapInfo();
 	
-	// loop closure instance
-	slam::LoopClosureBase *loopDetect = new slam::ScanContextLoopClosure();
-	
-	// g2o instance
-	slam::optimizer::GraphOptimize optimizer;
-
 	// print the map information
 	std::cout<<"------------- Map Information ----------------"<<std::endl;
 	std::cout<<"Map SizeX: "<<mapInfo.getSizeX()<<std::endl;
@@ -73,11 +62,7 @@ int main()
 
 	// slam process
 	// while it is not the end of the simulation file
-	int keyFrameCount = 0;
-	
-	std::vector<slam::sensor::LaserScan> keyScans;
-	std::vector<Eigen::Vector3f> keyPoses;
-
+	int count = 0;
 	while( !simulation.endOfFile() ){
 		// 1. get the laser data
 		slam::sensor::LaserScan scan;
@@ -90,13 +75,6 @@ int main()
 		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;	
 		if( simulation.getFrameCount() <= 10  ){
 			slam.processTheFirstScan( robotPosePrev, scanContainer );
-			if( simulation.getFrameCount() == 10 ){
-				// initial key pose and key scan
-				keyScans.push_back( scan );
-                        	keyPoses.push_back( robotPosePrev );
-				
-				optimizer.addVertex( robotPosePrev, keyFrameCount );
-			}
 		}
 		else{
 	
@@ -108,49 +86,12 @@ int main()
 			std::cout<<"robot pose now: "<<std::endl;
 			std::cout<<robotPosePrev<<std::endl;
 			std::cout<<"------------------"<<std::endl;
-			
-			// 3. if this is a key scan frame
-			if( slam.isKeyFrame() ){
-				keyFrameCount ++;			
-	
-				keyScans.push_back( scan );
-				keyPoses.push_back( robotPosePrev );
-				
-				optimizer.addVertex( robotPosePrev, keyFrameCount ); // add a vertex
-				Eigen::Matrix3d information = Eigen::Matrix3d::Identity(); //information matrix
-		
-				optimizer.addEdge( slam.getPoseDifferenceValue(), keyFrameCount - 1, keyFrameCount, information ); // add a edge
-		
-				loopDetect->detectLoop( scan ); // loop detect
-				
-				int loopId = loopDetect->detectedALoop();
-				if( loopId != -1 ){
-					loopDetect->caculateTransformByICP();
-	
-					// TODO ...
-					Eigen::Vector3f loopPoseDiff;
-
-					optimizer.addEdge( loopPoseDiff, keyFrameCount, loopId, information );
-				
-					optimizer.execuateGraphOptimization();
-					
-					optimizer.getOptimizedResults();
-		
-					std::vector<Eigen::Vector3f> estimatedPoses = optimizer.getEstimatedPoses();
-					
-					keyPoses.erase( keyPoses.begin() + loopId, keyPoses.end() );
-	
-					keyPoses.insert( keyPoses.end(), estimatedPoses.begin(), estimatedPoses.end() );
-				
-				}
-			}
-			
-
 		}
 		// 3. display the map
 		slam.displayMap( image );
 		
 		cv::waitKey(5);	
+		count ++;
 	}
 		
 

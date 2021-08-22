@@ -258,6 +258,25 @@ bool SlamProcessor::isKeyFrame() const
 	return keyFrame;
 }
 
+void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std::vector<slam::sensor::LaserScan> &keyScans )
+{
+	std::cerr<<" -------------- ReConstruct the Map According to the estimated Key Poses --------------"<<std::endl;
+	// reset the occupied map
+	occupiedGridMap->resetGridMap();
+
+	for( size_t i = 0; i < keyPoses.size(); i ++ ){
+		slam::ScanContainer scanContainer;
+		
+		// TODO ... change
+		scanContainer.pointTransform2LaserCoords( keyScans[i] );
+
+		// reconstruct the map	
+		occupiedGridMap->updateByScan( scanContainer, keyPoses[i] );
+		
+	}
+
+}
+
 }
 
 

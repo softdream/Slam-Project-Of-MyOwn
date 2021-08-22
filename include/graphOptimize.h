@@ -41,6 +41,12 @@ public:
 	int execuateGraphOptimization();
 	
 	void getOptimizedResults();
+	
+	const std::vector<Eigen::Vector3f> getEstimatedPoses() const
+	{
+		return estimatedPoses;
+	}
+
 private:
 	g2o::SparseOptimizer optimizer; // allocating the optimizer
 	

@@ -17,7 +17,7 @@ FIND_PACKAGE( OpenCV REQUIRED )
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 
 
-AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/loopClosure_test test_src )
+AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/slam_simulation_without_g2o/ test_src )
 
 INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../include" )
 
@@ -26,8 +26,8 @@ LINK_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../build/lib/" )
 #directory of opencv link libs
 LINK_DIRECTORIES(${OpenCV_LIBRARY_DIRS})
 
-ADD_EXECUTABLE( loopClosureTest ${test_src} )
+ADD_EXECUTABLE( slamSimulationWithoutG2O ${test_src} )
 
-TARGET_LINK_LIBRARIES( loopClosureTest slam.a )
+TARGET_LINK_LIBRARIES( slamSimulationWithoutG2O slam.a )
 
-TARGET_LINK_LIBRARIES( loopClosureTest ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES( slamSimulationWithoutG2O ${OpenCV_LIBS} )

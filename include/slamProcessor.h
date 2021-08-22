@@ -48,6 +48,9 @@ public:
 
 	bool isKeyFrame() const;
 
+	void reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, 
+			     std::vector<slam::sensor::LaserScan> &keyScans );
+
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 
