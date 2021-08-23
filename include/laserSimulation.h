@@ -43,6 +43,9 @@ static int readLaserTXT(std::string fileName, Laser *scan)
 		std::string tag;
 		iss >> tag;
 		std::string num;
+
+		// ----------------------------------------------- //
+
 		if (tag.compare("laser") == 0) {
 			
 			for (int i = 0; i < 360; i++) {
@@ -73,6 +76,8 @@ public:
 
 	bool readAFrameData( slam::sensor::LaserScan &scan );
 	
+	bool readLaserInfo( slam::sensor::LaserScan &scan );
+
 	inline const int filePointPose()
 	{
 		return input_file.tellg();

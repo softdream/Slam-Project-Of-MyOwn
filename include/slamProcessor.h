@@ -43,6 +43,7 @@ public:
 	const Eigen::Vector3f getLastMapUpdatePose() const;
 
 	void displayMap( cv::Mat &image ) ;
+	void displayMap( cv::Mat &image, const std::vector<Eigen::Vector3f> &poses );
 
 	const Eigen::Vector3f getPoseDifferenceValue() const;
 

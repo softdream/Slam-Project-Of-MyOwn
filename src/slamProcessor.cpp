@@ -219,10 +219,11 @@ void SlamProcessor::displayMap( cv::Mat &image )
 	
 	int occupiedCount = 0;
 
+	// display the map
 	for( int i = 0; i < occupiedGridMap->getSizeX(); i ++ ){
 		for( int j = 0; j < occupiedGridMap->getSizeY(); j ++ ){
 			if( occupiedGridMap->isCellFree( i, j ) ){
-                                cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(255, 255, 255), 1);
+                                cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(255, 255, 255), -1);
                         
 #ifdef TERMINAL_LOG
 			        std::cout<<"Free Point: ( "<<i<<", "<<j<<" )"<<std::endl;
@@ -236,11 +237,16 @@ void SlamProcessor::displayMap( cv::Mat &image )
                                 std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
                                 std::cout<<"log Odds value: "<<occumap.getCellLogOdds(i, j)<<std::endl;
 #endif
-				cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), 1);
+				cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), -1);
                         }
 
 		}
 	}
+
+	// display the robot pose
+	Eigen::Vector3f poseVec = occupiedGridMap->robotPoseWorld2Map( lastMapUpdatePose );
+	cv::Point2d pose( poseVec(0), poseVec(1) );
+	cv::circle(image, pose, 3, cv::Scalar(0, 255, 0), -1);
 
 	std::cout<<"---------------- Result --------------------"<<std::endl;
         std::cout<<"Occupied Points Number: "<<occupiedCount<<std::endl;
@@ -277,7 +283,50 @@ void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std:
 
 }
 
+void SlamProcessor::displayMap( cv::Mat &image, const std::vector<Eigen::Vector3f> &poses )
+{
+        int occupiedCount = 0;
+
+        // display the map
+        for( int i = 0; i < occupiedGridMap->getSizeX(); i ++ ){
+                for( int j = 0; j < occupiedGridMap->getSizeY(); j ++ ){
+                        if( occupiedGridMap->isCellFree( i, j ) ){
+                                cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(255, 255, 255), -1);
+
+#ifdef TERMINAL_LOG
+                                std::cout<<"Free Point: ( "<<i<<", "<<j<<" )"<<std::endl;
+                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+#endif
+                        }
+                        else if( occupiedGridMap->isCellOccupied( i, j ) ){
+                                occupiedCount ++;
+#ifdef TERMINAL_LOG
+                                std::cout<<"Occupied Point: ( "<<i<<", "<<j<<" )"<<std::endl;
+                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+                                std::cout<<"log Odds value: "<<occumap.getCellLogOdds(i, j)<<std::endl;
+#endif
+                                cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), -1);
+                        }
+
+                }
+        }
+
+        // display the robot pose
+	for( auto it : poses ){
+        	Eigen::Vector3f poseVec = occupiedGridMap->robotPoseWorld2Map( it );
+	        cv::Point2d pose( poseVec(0), poseVec(1) );
+        	cv::circle(image, pose, 3, cv::Scalar(0, 255, 0), -1);
+	}
+        std::cout<<"---------------- Result --------------------"<<std::endl;
+        std::cout<<"Occupied Points Number: "<<occupiedCount<<std::endl;
+
+        cv::imshow( "map", image );
+
 }
+
+
+
+} // end of namespace slam
 
 
 

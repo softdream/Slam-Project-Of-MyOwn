@@ -6,18 +6,18 @@ void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContain
 {
         size_t size = 1440;
 
-        float angle = -3.14159f;
+        float angle = -3.12413907051f;
         container.clear();
 
         for( int i = 0; i < size; i ++ ){
                 float dist = scan.ranges[ i ];
 
-                if( dist >= 0.0099999998f && dist <= 15.0000000000f ){
+                if( dist >= 0.25f && dist <= 15.0000000000f ){
                         //dist *= scaleToMap;
                         container.addData( Eigen::Vector2f( cos(angle) * dist, sin(angle) * dist ) );
                 }
 
-                angle += 0.0043633231f;
+                angle += 0.00435422640294f;
         }
 
         std::cout<<"Scan Container Size: "<<container.getSize()<<std::endl;
@@ -50,7 +50,7 @@ int main()
 	cv::imshow("map", image);
 	
 	// open the simulation file
-	std::string file_name = "../../../simulation_file/laser_data.txt";
+	std::string file_name = "../../../simulation_file/floor3.txt";
 	simulation.openSimulationFile( file_name );
 
 	// convarince
@@ -63,6 +63,10 @@ int main()
 	// slam process
 	// while it is not the end of the simulation file
 	int count = 0;
+
+	// key poses
+	std::vector<Eigen::Vector3f> keyPoses;
+
 	while( !simulation.endOfFile() ){
 		// 1. get the laser data
 		slam::sensor::LaserScan scan;
@@ -75,6 +79,11 @@ int main()
 		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;	
 		if( simulation.getFrameCount() <= 10  ){
 			slam.processTheFirstScan( robotPosePrev, scanContainer );
+			slam.displayMap( image );
+			
+			if( simulation.getFrameCount() == 10 ){
+				keyPoses.push_back( robotPosePrev );
+			}
 		}
 		else{
 	
@@ -86,9 +95,14 @@ int main()
 			std::cout<<"robot pose now: "<<std::endl;
 			std::cout<<robotPosePrev<<std::endl;
 			std::cout<<"------------------"<<std::endl;
+		
+			if( slam.isKeyFrame() ){
+				keyPoses.push_back( robotPosePrev );
+				slam.displayMap( image, keyPoses );
+			}
 		}
 		// 3. display the map
-		slam.displayMap( image );
+		//slam.displayMap( image );
 		
 		cv::waitKey(5);	
 		count ++;

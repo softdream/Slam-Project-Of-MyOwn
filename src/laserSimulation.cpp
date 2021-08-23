@@ -34,7 +34,8 @@ void Simulation::closeSimulationFile()
 
 bool Simulation::readAFrameData( slam::sensor::LaserScan &scan )
 {
-	memset( &scan, 0, sizeof( scan ) );	
+	//memset( &scan, 0, sizeof( scan ) );	
+	memset( scan.ranges, 0, scan.size() );
 
 	std::string line;
 
@@ -63,6 +64,63 @@ bool Simulation::readAFrameData( slam::sensor::LaserScan &scan )
 			
 		}
 	}
+}
+
+bool Simulation::readLaserInfo( slam::sensor::LaserScan &scan )
+{
+	memset( &scan, 0, sizeof( scan ) );
+
+	std::string line;
+	
+	for( int i = 0; i < 7; i ++ ){
+		std::getline( input_file, line );
+
+		std::istringstream iss( line );
+
+		std::string tag;
+		
+		iss >> tag;
+		
+		std::string num;
+
+		if( tag.compare( "angle_min:" ) == 0 ){
+			iss >> num;
+			std::cout<<"angle_min: "<<num<<std::endl;
+			
+			scan.angle_min = std::stof( num );
+		}
+
+		if( tag.compare( "angle_max:" ) == 0 ){
+			iss >> num;
+			std::cout<<"angle_max: "<<num<<std::endl;
+	
+			scan.angle_max = std::stof( num );
+		}
+
+		if( tag.compare( "angle_increment:" ) == 0 ){
+			iss >> num;
+			std::cout<<"angle_increment: "<<num<<std::endl;
+	
+			scan.angle_increment = std::stof( num );
+		}
+
+		if( tag.compare( "range_min:" ) == 0 ){
+			iss >> num;
+			std::cout<<"range_min: "<<num<<std::endl;
+		
+			scan.angle_min = std::stof( num );
+		}
+	
+		if( tag.compare( "range_max:" ) == 0 )	{
+			iss >> num;
+			std::cout<<"range_max: "<<num<<std::endl;
+
+			scan.angle_max = std::stof( num );
+		}
+
+	}
+
+	return true;
 }
 
 }
