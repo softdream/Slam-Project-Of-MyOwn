@@ -25,7 +25,11 @@ public:
 	}
 	
 private:
-	float iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vector2f>& B_apostrophe );
+	const float iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vector2f>& B_apostrophe );
+
+	const Eigen::Vector2f getClosestPoint( const Eigen::Vector2f &point, const std::vector<Eigen::Vector2f> &sourcePoints );
+
+	const int getClosestPointID( const Eigen::Vector2f &point, const std::vector<Eigen::Vector2f> &sourcePoints );
 
 private:
 	Eigen::Vector2f Acenter;

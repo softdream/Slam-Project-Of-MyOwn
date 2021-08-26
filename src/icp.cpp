@@ -68,7 +68,7 @@ const float ICP::solveICP( ScanContainer& A_src, ScanContainer& B_src )
 	return loss;
 }
 
-float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vector2f>& B_apostrophe )
+const float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vector2f>& B_apostrophe )
 {
 	Eigen::Vector2f Bsum(0.0f, 0.0f);
 
@@ -87,9 +87,12 @@ float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vect
 	// theta = arctan( Sigma(i = 1 to n){( a_i(x) * b_i(y) - a_i(y) * b_i(x) )} / Sigma(i = 1 to n){ (a_i(x) * b_i(x) + a_i(y) * b_i(y)) } );
 	float y = 0.0f, x = 0.0f;
 	for( size_t i = 0; i < b.size(); i ++ ){
-		y += ( a[i](0) * b[i](1) ) - ( a[i](1) * b[i](0) );
+		// find the closest point index in b set
+		int index = getClosestPointID( a[i], b );	
+		
+		y += ( a[i](0) * b[index](1) ) - ( a[i](1) * b[index](0) );
 	
-		x += ( a[i](0) * b[i](0) ) + ( a[i](1) * b[i](1) );
+		x += ( a[i](0) * b[index](0) ) + ( a[i](1) * b[index](1) );
 	}
 	float theta = ::atan2( y, x );
 	std::cout<<"theta = "<<theta<<std::endl;	
@@ -115,12 +118,52 @@ float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen::Vect
 	// Loss = Sigma(i = 1 to n){(A_i - B_apostrophe_i) * (A_i - B_apostrophe_i)} / n
 	float loss = 0.0f;
 	for( size_t i = 0; i < B.size(); i ++ ){
-		Eigen::Vector2f tmp = A[i] - B[i];
+		int index = getClosestPointID( A[i], B );
+
+		Eigen::Vector2f tmp = A[i] - B[index];
 		loss += tmp.squaredNorm();
 	}
 	loss /= B.size();
 
 	return loss;
+}
+
+const Eigen::Vector2f ICP::getClosestPoint( const Eigen::Vector2f &point, const std::vector<Eigen::Vector2f> &sourcePoints )
+{
+	float dist_min = 100000.0f;
+	Eigen::Vector2f closestPoint;	
+
+	for( int i = 0; i < sourcePoints.size(); i ++ ){
+		float dist = ( point - sourcePoints[i] ).norm();
+		
+		if( dist < dist_min ){
+			dist_min = dist;
+			
+			closestPoint(0) = sourcePoints[i](0);
+			closestPoint(1) = sourcePoints[i](1);
+		}
+	}
+
+	return closestPoint;
+}
+
+const int ICP::getClosestPointID( const Eigen::Vector2f &point, const std::vector<Eigen::Vector2f> &sourcePoints )
+{
+	float dist_min = 100000.0f;
+	int id = 0;
+	
+	for( int i = 0; i < sourcePoints.size(); i ++ ){
+		float dist = ( point - sourcePoints[i] ).norm();
+	
+		if( dist < dist_min ){
+			dist_min = dist;
+			
+			id = i;
+		}
+	}
+
+	return id;
+
 }
 
 
