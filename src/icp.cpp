@@ -14,6 +14,7 @@ ICP::~ICP()
 
 }
 
+// B -> A
 const float ICP::solveICP( ScanContainer& A_src, ScanContainer& B_src )
 {
 	A.clear();
