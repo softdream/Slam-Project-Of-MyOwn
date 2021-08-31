@@ -42,6 +42,8 @@ public:
 //	Eigen::Vector3f getLastMapUpdatePose() const;
 	const Eigen::Vector3f getLastMapUpdatePose() const;
 
+	const Eigen::Matrix3f getCovarianceMatrix() const;
+
 	void displayMap( cv::Mat &image ) ;
 	void displayMap( cv::Mat &image, const std::vector<Eigen::Vector3f> &poses );
 

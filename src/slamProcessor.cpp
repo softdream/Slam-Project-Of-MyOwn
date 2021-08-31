@@ -99,7 +99,11 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 	Eigen::Vector3f newPoseEstimated;// estimated pose in world coordinate
 	
 	if( !mapWithoutMatching ){
-		newPoseEstimated = scanMatch->scanToMap( *occupiedGridMap, robotPoseInWorld, scanContainer, covarianceMatrix, 100 );
+		newPoseEstimated = scanMatch->scanToMap( *occupiedGridMap, 
+							 robotPoseInWorld, 
+							 scanContainer, 
+							 covarianceMatrix, 
+							 100 );
 	}
 	else {
 		newPoseEstimated = robotPoseInWorld;
@@ -213,6 +217,10 @@ const Eigen::Vector3f SlamProcessor::getLastMapUpdatePose() const
         return lastMapUpdatePose;
 }
 
+const Eigen::Matrix3f SlamProcessor::getCovarianceMatrix() const 
+{
+	return covarianceMatrix;
+}
 
 void SlamProcessor::displayMap( cv::Mat &image ) 
 {
