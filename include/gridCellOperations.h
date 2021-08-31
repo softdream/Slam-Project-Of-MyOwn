@@ -16,6 +16,9 @@ public:
 	void setLogOddsPocc( float Pocc );
 	void setLogOddsPfree( float Pfree );
 
+	const float getLogOddsPocc() const;
+	const float getLogOddsPfree() const;
+
 	void setCellFree( GridCell &cell ) const;
 	void setCellOccupied( GridCell &cell ) const;
 	void setCellUnFree( GridCell &cell ) const;

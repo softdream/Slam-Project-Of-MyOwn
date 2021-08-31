@@ -61,5 +61,14 @@ void GridCellOperations::setCellUnFree( GridCell &cell ) const
 	cell.logOddsValue -= logOddsPfree;
 }
 
+const float GridCellOperations::getLogOddsPocc() const
+{
+	return logOddsPocc;
+}
+
+const float GridCellOperations::getLogOddsPfree() const
+{
+	return logOddsPfree;
+}
 
 }

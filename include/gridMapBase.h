@@ -11,6 +11,9 @@ template<typename CellType, typename CellOperations>
 class GridMapBase
 {
 public:
+	using GridType = CellType;
+
+public:
 	GridMapBase();
 
 	GridMapBase( const GridMapBase &rhs );
@@ -63,6 +66,9 @@ public:
 
 	void setLogOddsPoccValue( float Pocc );
 	void setLogOddsPfreeValue( float Pfree );
+	const float getLogOddsPoccValue() const;
+	const float getLogOddsPfreeValue() const;
+	
 
 	bool isCellOccupied( int index );
 	bool isCellOccupied( int mapX, int mapY );
@@ -70,6 +76,10 @@ public:
 	bool isCellFree( int mapX, int mapY );
 
 	float getCellLogOdds(int mapX, int mapY);	
+
+	const std::vector<CellType> getMapArray() const;
+	
+	void setMapArray( const std::vector<CellType> &mapArray );
 
 protected:
 	void allocateMapArray();
@@ -384,6 +394,18 @@ void GridMapBase<CellType, CellOperations>::setLogOddsPfreeValue( float Pfree )
 }
 
 template<typename CellType, typename CellOperations>
+const float GridMapBase<CellType, CellOperations>::getLogOddsPoccValue() const
+{
+	return cellOperate.getLogOddsPocc();
+}
+
+template<typename CellType, typename CellOperations>
+const float GridMapBase<CellType, CellOperations>::getLogOddsPfreeValue() const
+{
+	return cellOperate.getLogOddsPfree();
+}
+
+template<typename CellType, typename CellOperations>
 bool GridMapBase<CellType, CellOperations>::isCellOccupied( int index )
 {
 	return ( this->getCell( index ).isOccupied() );
@@ -413,7 +435,17 @@ float GridMapBase<CellType, CellOperations>::getCellLogOdds( int mapX, int mapY 
 	return (this->getCell( mapX, mapY ).logOddsValue);
 }
 
+template<typename CellType, typename CellOperations>
+const std::vector<CellType> GridMapBase<CellType, CellOperations>::getMapArray() const
+{
+	return mapArray;
+}
 
+template<typename CellType, typename CellOperations>
+void GridMapBase<CellType, CellOperations>::setMapArray( const std::vector<CellType> &mapArray )
+{
+	this->mapArray = mapArray;
+}
 
 }
 
