@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 
+#include <memory>
+
 namespace slam {
 
 template<typename CellType, typename CellOperations>
@@ -12,6 +14,8 @@ class GridMapBase
 {
 public:
 	using GridType = CellType;
+	using GridOperations = CellOperations;
+	using Ptr = std::shared_ptr<GridMapBase<CellType, CellOperations>>;
 
 public:
 	GridMapBase();

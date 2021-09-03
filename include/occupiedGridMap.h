@@ -9,11 +9,19 @@
 
 #include "scanContainer.h"
 
+#include <memory>
+
 namespace slam {
 
 template<typename MapBaseType>
 class OccupiedGridMap : public MapBaseType
 {
+public:
+	using MapType = MapBaseType;
+	using OccupiedGridMapType = OccupiedGridMap<MapBaseType>;
+	
+	using Ptr = std::shared_ptr<OccupiedGridMap<MapBaseType>>;	
+
 public:
 	OccupiedGridMap();
 	
