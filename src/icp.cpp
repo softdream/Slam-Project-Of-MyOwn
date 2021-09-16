@@ -87,11 +87,15 @@ const float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen
 	// 3. caculate the rotate theta
 	// theta = arctan( Sigma(i = 1 to n){( a_i(x) * b_i(y) - a_i(y) * b_i(x) )} / Sigma(i = 1 to n){ (a_i(x) * b_i(x) + a_i(y) * b_i(y)) } );
 	float y = 0.0f, x = 0.0f;
+	
 	for( size_t i = 0; i < b.size(); i ++ ){
 		// find the closest point index in b set
 		int index = getClosestPointID( a[i], b );	
-		
-		y += ( a[i](0) * b[index](1) ) - ( a[i](1) * b[index](0) );
+	
+		//  1        | ( a_i_y * b_i_x - a_i_x * b_i_y ) | 
+		// --- Sigma | --------------------------------- | = tan( theta )
+		//  n        | ( a_i_x * b_i_x + a_i_y * b_i_y ) |
+		y += ( a[i](1) * b[index](0) ) - ( a[i](0) * b[index](1) );
 	
 		x += ( a[i](0) * b[index](0) ) + ( a[i](1) * b[index](1) );
 	}
