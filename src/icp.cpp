@@ -89,15 +89,15 @@ const float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen
 	float y = 0.0f, x = 0.0f;
 	
 	for( size_t i = 0; i < b.size(); i ++ ){
-		// find the closest point index in b set
-		int index = getClosestPointID( a[i], b );	
+		// find the closest point index in a set
+		int index = getClosestPointID( b[i], a );	
 	
 		//  1        | ( a_i_y * b_i_x - a_i_x * b_i_y ) | 
 		// --- Sigma | --------------------------------- | = tan( theta )
 		//  n        | ( a_i_x * b_i_x + a_i_y * b_i_y ) |
-		y += ( a[i](1) * b[index](0) ) - ( a[i](0) * b[index](1) );
+		y += ( a[index](1) * b[i](0) ) - ( a[index](0) * b[i](1) );
 	
-		x += ( a[i](0) * b[index](0) ) + ( a[i](1) * b[index](1) );
+		x += ( a[index](0) * b[i](0) ) + ( a[index](1) * b[i](1) );
 	}
 	float theta = ::atan2( y, x );
 	std::cout<<"theta = "<<theta<<std::endl;	
@@ -123,9 +123,9 @@ const float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen
 	// Loss = Sigma(i = 1 to n){(A_i - B_apostrophe_i) * (A_i - B_apostrophe_i)} / n
 	float loss = 0.0f;
 	for( size_t i = 0; i < B.size(); i ++ ){
-		int index = getClosestPointID( A[i], B );
+		int index = getClosestPointID( B[i], A );
 
-		Eigen::Vector2f tmp = A[i] - B[index];
+		Eigen::Vector2f tmp = A[index] - B[i];
 		loss += tmp.squaredNorm();
 	}
 	loss /= B.size();
