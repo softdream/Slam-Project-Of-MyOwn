@@ -85,7 +85,7 @@ const float ICP::iterateOnce( std::vector<Eigen::Vector2f>& B, std::vector<Eigen
 	}
 
 	// 3. caculate the rotate theta
-	// theta = arctan( Sigma(i = 1 to n){( a_i(x) * b_i(y) - a_i(y) * b_i(x) )} / Sigma(i = 1 to n){ (a_i(x) * b_i(x) + a_i(y) * b_i(y)) } );
+	// theta = arctan( Sigma(i = 1 to n){( a_i(y) * b_i(x) - a_i(x) * b_i(y) )} / Sigma(i = 1 to n){ (a_i(x) * b_i(x) + a_i(y) * b_i(y)) } );
 	float y = 0.0f, x = 0.0f;
 	
 	for( size_t i = 0; i < b.size(); i ++ ){
