@@ -64,6 +64,7 @@ const float ICP::solveICP( ScanContainer& A_src, ScanContainer& B_src )
 		
 		B.swap( B_apostrophe );	
 		iteration ++;
+		B_apostrophe.clear();
 	}
 
 	return loss;
