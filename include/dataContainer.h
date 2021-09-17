@@ -15,6 +15,9 @@ public:
 	DataContainer();
 	~DataContainer();
 
+	DataContainer( const DataContainer &rhs );
+	const DataContainer& operator=( const DataContainer &rhs );
+
 	void addData( const DataType &data );
 	void clear();
 	
@@ -25,7 +28,7 @@ public:
 	
 	int getSize() const;
 
-	void displayAFrameScan( const float scale ) const;
+	void displayAFrameScan( int num, const float scale ) const;
 	
 private:
 	std::vector<DataType> dataVec;
@@ -43,6 +46,25 @@ DataContainer<DataType>::~DataContainer()
 {
 
 }
+
+template<typename DataType>
+DataContainer<DataType>::DataContainer( const DataContainer &rhs ) : dataVec( rhs.dataVec )
+{
+
+}
+
+template<typename DataType>
+const DataContainer<DataType>& DataContainer<DataType>::operator=( const DataContainer &rhs )
+{
+	if( &rhs == this ){
+		return *this;
+	}
+
+	this->dataVec = rhs.dataVec;
+
+	return *this;
+}
+
 
 template<typename DataType>
 int DataContainer<DataType>::getSize() const
@@ -95,7 +117,7 @@ void DataContainer<DataType>::pointTransform2LaserCoords( const LaserData &scan 
 }
 
 template<typename DataType>
-void DataContainer<DataType>::displayAFrameScan( const float scale ) const
+void DataContainer<DataType>::displayAFrameScan( int num, const float scale ) const
 {
 	cv::Mat image = cv::Mat::zeros( 600, 600, CV_8UC3 );
 	cv::Point2d center( 300, 300 );
@@ -109,7 +131,7 @@ void DataContainer<DataType>::displayAFrameScan( const float scale ) const
 		cv::circle(image, point, 1, cv::Scalar(0, 0, 255), 1);
 	} 
 
-	cv::imshow( "scan", image );
+	cv::imshow( "scan" + std::to_string( num ), image );
 }
 
 
