@@ -1,25 +1,28 @@
 #include "slamProcessor.h"
 #include "laserSimulation.h"
-#include <unistd.h>
 
-#include "odomSimulation.h"
+#include "loopClosureScanContext.h"
+
+#include "graphOptimize.h"
+
+#include <unistd.h>
 
 void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
 {
         size_t size = 1440;
 
-        float angle = -3.12413907051f;
+        float angle = -3.14159f;
         container.clear();
 
         for( int i = 0; i < size; i ++ ){
                 float dist = scan.ranges[ i ];
 
-                if( dist >= 0.25f && dist <= 15.0000000000f ){
+                if( dist >= 0.0099999998f && dist <= 15.0000000000f ){
                         //dist *= scaleToMap;
                         container.addData( Eigen::Vector2f( cos(angle) * dist, sin(angle) * dist ) );
                 }
 
-                angle += 0.00435422640294f;
+                angle += 0.0043633231f;
         }
 
         std::cout<<"Scan Container Size: "<<container.getSize()<<std::endl;
@@ -35,7 +38,11 @@ int main()
 	slam::simulation::Simulation simulation;
 	slam::MapInfo mapInfo = slam.getMapInfo();
 	
-	slam::simulation::OdomSimulation ouputOdom;	
+	// loop closure instance
+	slam::LoopClosureBase *loopDetect = new slam::ScanContextLoopClosure();
+	
+	// g2o instance
+	slam::optimizer::GraphOptimize optimizer;
 
 	// print the map information
 	std::cout<<"------------- Map Information ----------------"<<std::endl;
@@ -57,10 +64,6 @@ int main()
 	std::string file_name = "../../../simulation_file/laser_data.txt";
 	simulation.openSimulationFile( file_name );
 
-
-	// added for recording the laser odometry data
-	ouputOdom.openOutputSimulationFile( "../../../simulation_file/odometry2.txt" );
-		
 	// convarince
 	Eigen::Matrix3f covarince;
 
@@ -70,9 +73,9 @@ int main()
 
 	// slam process
 	// while it is not the end of the simulation file
-	int count = 0;
-
-	// key poses
+	int keyFrameCount = 0;
+	
+	std::vector<slam::sensor::LaserScan> keyScans;
 	std::vector<Eigen::Vector3f> keyPoses;
 
 	while( !simulation.endOfFile() ){
@@ -87,42 +90,82 @@ int main()
 		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;	
 		if( simulation.getFrameCount() <= 10  ){
 			slam.processTheFirstScan( robotPosePrev, scanContainer );
-			slam.displayMap( image );
-			
 			if( simulation.getFrameCount() == 10 ){
-				keyPoses.push_back( robotPosePrev );
+				// initial key pose and key scan
+				keyScans.push_back( scan );
+                        	keyPoses.push_back( robotPosePrev );
+				
+				optimizer.addVertex( robotPosePrev, keyFrameCount );
 			}
-
-			// added 
-			ouputOdom.writeAFrameData( robotPosePrev );
 		}
 		else{
 	
 			// 1. Update by Scan Match, get the estimated pose 
 			slam.update( robotPosePrev, scanContainer );
-	
+		
 			// 2. get the newest robot pose in world coordinate	
 			robotPosePrev = slam.getLastScanMatchPose();
 			std::cout<<"robot pose now: "<<std::endl;
 			std::cout<<robotPosePrev<<std::endl;
 			std::cout<<"------------------"<<std::endl;
-	
-			// record
-			ouputOdom.writeAFrameData( robotPosePrev );
-		
+			
+			// 3. if this is a key scan frame
 			if( slam.isKeyFrame() ){
-				// added for recording the laser odometry data
-				//ouputOdom.writeAFrameData( robotPosePrev );
+				std::cerr<<"--------------------- Key Frame : "<<keyFrameCount <<"-----------------------"<<std::endl;
+				keyFrameCount ++;			
 	
+				//keyScans.push_back( scan );
 				keyPoses.push_back( robotPosePrev );
-				slam.displayMap( image, keyPoses );
+				
+				optimizer.addVertex( robotPosePrev, keyFrameCount ); // add a vertex
+				Eigen::Matrix3d information = Eigen::Matrix3d::Identity(); //information matrix
+		
+				optimizer.addEdge( slam.getPoseDifferenceValue(), keyFrameCount - 1, keyFrameCount, information ); // add a edge
+		
+				loopDetect->detectLoop( scan ); // loop detect
+				
+				int loopId = loopDetect->detectedALoop();
+				if( loopId != -1 ){
+					//loopDetect->caculateTransformByICP();
+	
+					// TODO ...
+					Eigen::Vector3f loopPoseDiff( 0.0f, 0.0f, 0.0f );
+
+					optimizer.addEdge( loopPoseDiff, keyFrameCount, loopId, information );
+				
+					optimizer.execuateGraphOptimization();
+					
+					optimizer.getOptimizedResults();
+		
+					std::vector<Eigen::Vector3f> estimatedPoses = optimizer.getEstimatedPoses();
+					std::cout<<"keyPoses.size  = "<<keyPoses.size()<<std::endl;
+					std::cout<<"estimatedPoses.size = "<<estimatedPoses.size()<<std::endl;
+
+					// TODO ... process the estimated results
+					//keyPoses.erase( keyPoses.begin() + loopId, keyPoses.end() );
+	
+					//keyPoses.insert( keyPoses.end(), estimatedPoses.begin(), estimatedPoses.end() );
+				
+				}
+				else if( keyFrameCount % 50 == 0 ){
+					// execuate the graph optimization every 50 key points
+					optimizer.execuateGraphOptimization();
+
+                                        optimizer.getOptimizedResults();
+
+                                        std::vector<Eigen::Vector3f> estimatedPoses = optimizer.getEstimatedPoses();
+                                        std::cout<<"keyPoses.size  = "<<keyPoses.size()<<std::endl;
+                                        std::cout<<"estimatedPoses.size = "<<estimatedPoses.size()<<std::endl;
+					// TODO ... process the estimated results
+				}
 			}
+			
+
 		}
 		// 3. display the map
-		//slam.displayMap( image );
+		slam.displayMap( image );
 		
 		cv::waitKey(5);	
-		count ++;
 	}
 		
 

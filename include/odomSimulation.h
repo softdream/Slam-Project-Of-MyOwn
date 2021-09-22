@@ -26,12 +26,20 @@ public:
 
 	bool readAFrameData( Eigen::Vector3f &odom );
 
-        inline const int filePointPose()
+	// added for ouputing the data of laser odometry
+	bool openOutputSimulationFile( const std::string &outputFile );
+	void closeOutputSimulationFile();
+
+	bool writeAFrameData( const Eigen::Vector3f &odom );
+	
+	// ---------------------- END ---------------------------//
+	
+        inline const int inputFilePointPose()
         {
                 return input_file.tellg();
         }
 
-        inline const int endOfFile()
+        inline const int endOfInputFile()
         {
                 return input_file.eof();
         }
@@ -41,9 +49,18 @@ public:
                 return count;
         }
 
+	// added for the output file
+
+	inline const int endOfOutputFile()
+	{
+		return out_file.eof();
+	}
+	// END
 
 private:
 	std::ifstream input_file;
+	std::ofstream out_file;
+
         long count;
 
 };

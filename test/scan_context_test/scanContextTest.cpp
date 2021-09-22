@@ -94,7 +94,7 @@ int main()
 		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;
 
 		laserData2Container( scan, scanContainer );// convert the laser data to scanContainer type
-		scanContainer.displayAFrameScan( 20.0f );
+		scanContainer.displayAFrameScan( simulation.getFrameCount(), 20.0f );
 
 		odomSim.readAFrameData( poseNew );
 		std::cout<<"pose: "<<std::endl<<poseNew<<std::endl;	

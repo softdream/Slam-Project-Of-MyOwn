@@ -10,12 +10,15 @@ ADD_DEFINITIONS( -std=c++14 )
 # option of turning on the log or not
 OPTION( ONLOG "log on or off" OFF )
 
-set(G2O_USE_VENDORED_CERES ON CACHE BOOL "Use vendored Ceres from g2o/EXTERNAL/ceres")
-
 
 IF( ONLOG )
 	ADD_DEFINITIONS( -DTERMINAL_LOG )
 ENDIF( ONLOG )
+
+
+# set the g2o vendored ceres
+set(G2O_USE_VENDORED_CERES ON CACHE BOOL "Use vendored Ceres from g2o/EXTERNAL/ceres")
+
 
 # set the output directory of the libs
 SET( LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib" )

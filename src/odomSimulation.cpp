@@ -57,6 +57,42 @@ bool OdomSimulation::readAFrameData( Eigen::Vector3f &odom )
         }
 }
 
+bool OdomSimulation::openOutputSimulationFile( const std::string &outputFile )
+{
+	out_file.open( outputFile.c_str(), std::ios::app );
+	
+	if( !out_file.is_open() ){
+		std::cerr<<"Cannot open the output file ..."<<std::endl;
+		return false;
+	}		
+	
+	std::cout<<" ------------------ Open the output file ------------------"<<std::endl;
+	
+	return true;
+}
+
+
+void OdomSimulation::closeOutputSimulationFile()
+{
+	return out_file.close();
+}
+
+bool OdomSimulation::writeAFrameData( const Eigen::Vector3f &odom )
+{
+	std::cerr<<"Write a frame of data into the output file now ..."<<std::endl;
+#ifdef TERMINAL_LOG
+	std::cout<<"odom.x     = "<<odom(0)<<std::endl;
+	std::cout<<"odom.y     = "<<odom(1)<<std::endl;
+	std::cout<<"odom.theta = "<<odom(2)<<std::endl;
+	
+#endif
+	out_file << "odom ";
+	out_file << std::setprecision(10) << odom(0) << " " << odom(1) << " " << odom(2);
+	out_file << std::endl;
+	
+	return true;
+}
+
 
 }
 
