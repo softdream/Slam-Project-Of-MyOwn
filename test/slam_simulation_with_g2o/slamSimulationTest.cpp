@@ -113,7 +113,8 @@ int main()
 			if( slam.isKeyFrame() ){
 				std::cerr<<"--------------------- Key Frame : "<<keyFrameCount <<"-----------------------"<<std::endl;
 				keyFrameCount ++;			
-	
+				std::cout<<"key frame count : "<<keyFrameCount<<std::endl;			
+
 				//keyScans.push_back( scan );
 				keyPoses.push_back( robotPosePrev );
 				
@@ -126,6 +127,7 @@ int main()
 				
 				int loopId = loopDetect->detectedALoop();
 				if( loopId != -1 ){
+					// TODO ... Caculate the loop correlation
 					//loopDetect->caculateTransformByICP();
 					
 					if( ( robotPosePrev - keyPoses[loopId] ).head<2>() > 1.0f ){
