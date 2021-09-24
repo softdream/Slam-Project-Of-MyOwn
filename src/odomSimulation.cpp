@@ -25,6 +25,8 @@ bool OdomSimulation::openSimulationFile( const std::string &inputFile )
         }
 
         std::cout<<"............Open the Simulation File ............."<<std::endl;
+	
+	return true;
 }
 
 void OdomSimulation::closeSimulationFile()

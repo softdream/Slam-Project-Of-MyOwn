@@ -4,8 +4,10 @@
 #include <iostream>
 #include <cmath>
 
-#include "vertexSE2.h"
-#include "edgeSE2.h"
+//#include "vertexSE2.h"
+//#include "edgeSE2.h"
+
+#include "g2o/types/slam2d/types_slam2d.h"
 
 #include "g2o/core/sparse_optimizer.h"
 #include "g2o/core/block_solver.h"
@@ -46,6 +48,8 @@ public:
 	{
 		return estimatedPoses;
 	}
+
+	void saveG2OFile( const std::string &filePath  );
 
 private:
 	g2o::SparseOptimizer optimizer; // allocating the optimizer

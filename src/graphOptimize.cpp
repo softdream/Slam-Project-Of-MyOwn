@@ -27,11 +27,11 @@ void GraphOptimize::createOptimizer()
 
 void GraphOptimize::addVertex( const Eigen::Vector3f &pose, const int id )
 {
-	VertexSE2 *vertex = new VertexSE2();
+	g2o::VertexSE2 *vertex = new g2o::VertexSE2();
 	
 	vertex->setId( id );
 
-	vertex->setEstimate( SE2( pose(0), pose(1), pose(2) ) );
+	vertex->setEstimate( g2o::SE2( pose(0), pose(1), pose(2) ) );
 
 	optimizer.addVertex( vertex );
 
@@ -43,12 +43,12 @@ void GraphOptimize::addEdge( const Eigen::Vector3f &delta,
                              const int to,  
                              Eigen::Matrix3d &information )
 {
-	EdgeSE2 *edge = new EdgeSE2();
+	g2o::EdgeSE2 *edge = new g2o::EdgeSE2();
 	
 	edge->vertices()[0] = optimizer.vertex( from );
 	edge->vertices()[1] = optimizer.vertex( to );
 	
-	SE2 measurement( delta[0], delta[1], delta[2] );
+	g2o::SE2 measurement( delta[0], delta[1], delta[2] );
 	edge->setMeasurement( measurement );
 
 	edge->setId( edgeCount );
@@ -59,11 +59,17 @@ void GraphOptimize::addEdge( const Eigen::Vector3f &delta,
 
 	edgeCount ++;
 	
-	std::cout<<"add a edge to the optimize ... "<<std::endl;
+	std::cout<<"add a edge to the optimize ... edge count: "<<edgeCount<<std::endl;
 }
 
 int GraphOptimize::execuateGraphOptimization()
 {
+	//slam::optimizer::VertexSE2* firstRobotPose = dynamic_cast<slam::optimizer::VertexSE2*>(optimizer.vertex(0));
+        g2o::VertexSE2* firstRobotPose = dynamic_cast<g2o::VertexSE2*>(optimizer.vertex(0));
+	
+	firstRobotPose->setFixed(true);
+        optimizer.setVerbose(true);
+
 	optimizer.initializeOptimization();
 	
 	int iteration = 0;
@@ -72,25 +78,39 @@ int GraphOptimize::execuateGraphOptimization()
 
 	std::cout<<"execuate the graph optimization ... "<<std::endl;
 	
+	optimizer.save("./result.g2o");
+
 	return iteration; 
 }
 
 void GraphOptimize::getOptimizedResults()
 {
 	g2o::SparseOptimizer::VertexContainer nodes = optimizer.activeVertices();
+	
+	std::cout<<"------------------- Optimized Results -------------------"<<std::endl;
+	std::cout<<"Estimated Nodes Size = "<<nodes.size()<<std::endl;
+	std::cout<<"---------------------------------------------------------"<<std::endl;
 
 	// TODO ....
 	for(g2o::SparseOptimizer::VertexContainer::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-        	//double estimate[3];
+
+		//double estimate[3];
         	Eigen::Vector3d estimate;
 		if((*n)->getEstimateData(estimate)) {
-         		std::cout << "result:" << estimate<< std::endl; 
+        	//(*n)->getEstimateData(estimate);
+		//	std::cout << "result:" << estimate<< std::endl; 
  			
 			estimatedPoses.push_back( estimate.cast<float>()  );
 	       	}
     	}
 	
 }
+
+void GraphOptimize::saveG2OFile( const std::string &filePath )
+{
+	optimizer.save( filePath.c_str() );
+}
+
 
 }
 

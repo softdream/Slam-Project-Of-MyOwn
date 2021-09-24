@@ -127,7 +127,13 @@ int main()
 				int loopId = loopDetect->detectedALoop();
 				if( loopId != -1 ){
 					//loopDetect->caculateTransformByICP();
-	
+					
+					if( ( robotPosePrev - keyPoses[loopId] ).head<2>() > 1.0f ){
+						std::cout<<"loop closure is too large ..."<<std::endl;
+						continue;
+					}
+					std::cout<<"Find A Loop Closure ..."<<std::endl;
+					
 					// TODO ...
 					Eigen::Vector3f loopPoseDiff( 0.0f, 0.0f, 0.0f );
 

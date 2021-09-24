@@ -15,9 +15,6 @@ public:
 	DataContainer();
 	~DataContainer();
 
-	DataContainer( const DataContainer &rhs );
-	const DataContainer& operator=( const DataContainer &rhs );
-
 	void addData( const DataType &data );
 	void clear();
 	
@@ -28,8 +25,11 @@ public:
 	
 	int getSize() const;
 
-	void displayAFrameScan( int num, const float scale ) const;
+	void displayAFrameScan( const float scale = 10.0f ) const;
 	
+	template<typename Rotation, typename Translation>
+	void pointCoordinateTransformation( const Rotation &R, const Translation &T );
+
 private:
 	std::vector<DataType> dataVec;
 	
@@ -46,25 +46,6 @@ DataContainer<DataType>::~DataContainer()
 {
 
 }
-
-template<typename DataType>
-DataContainer<DataType>::DataContainer( const DataContainer &rhs ) : dataVec( rhs.dataVec )
-{
-
-}
-
-template<typename DataType>
-const DataContainer<DataType>& DataContainer<DataType>::operator=( const DataContainer &rhs )
-{
-	if( &rhs == this ){
-		return *this;
-	}
-
-	this->dataVec = rhs.dataVec;
-
-	return *this;
-}
-
 
 template<typename DataType>
 int DataContainer<DataType>::getSize() const
@@ -117,21 +98,30 @@ void DataContainer<DataType>::pointTransform2LaserCoords( const LaserData &scan 
 }
 
 template<typename DataType>
-void DataContainer<DataType>::displayAFrameScan( int num, const float scale ) const
+void DataContainer<DataType>::displayAFrameScan( const float scale ) const
 {
-	cv::Mat image = cv::Mat::zeros( 600, 600, CV_8UC3 );
-	cv::Point2d center( 300, 300 );
-	cv::circle(image, center, 1, cv::Scalar(0, 0, 255), 1);	
-
-	cv::line( image, cv::Point( 300, 0 ), cv::Point( 300, 600 ), cv::Scalar( 67, 128, 94 ), 1 );
-        cv::line( image, cv::Point( 0, 300 ), cv::Point( 600, 300 ), cv::Scalar( 67, 128, 94 ), 1 );
+	cv::Mat image = cv::Mat::zeros( 1200, 1200, CV_8UC3 );
+	cv::Point2d center( 600, 600 );
+	cv::circle(image, center, 1, cv::Scalar(0, 255, 0), 1);
+	cv::line( image, cv::Point( 600, 0 ), cv::Point( 600, 1200 ), cv::Scalar( 67, 128, 94 ), 1 );
+	cv::line( image, cv::Point( 0, 600 ), cv::Point( 1200, 600 ), cv::Scalar( 67, 128, 94 ), 1 );	
 
 	for( auto it : dataVec ){
-		cv::Point2d point( it(0) * scale + 300, it(1) * scale + 300 );
-		cv::circle(image, point, 1, cv::Scalar(0, 0, 255), 1);
+		cv::Point2d point( it(0) * scale + 600, it(1) * scale + 600 );
+		cv::circle(image, point, 3, cv::Scalar(0, 0, 255), 1);
 	} 
 
-	cv::imshow( "scan" + std::to_string( num ), image );
+	cv::imshow( "scan", image );
+}
+
+template<typename DataType>
+template<typename Rotation, typename Translation>
+void DataContainer<DataType>::pointCoordinateTransformation( const Rotation &R, const Translation &T )
+{
+	for( auto it : dataVec ){
+		DataType tmp = R * it + T;
+		it = tmp;
+	}
 }
 
 
