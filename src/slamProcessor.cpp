@@ -116,12 +116,25 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 		// if pose change is greater than the threshold, then this is a Key scan Frame
 		keyFrame = true;
 
+		// caculate the transformation from lastMapUpdatePose to newPoseEstimated
+		Eigen::Matrix<float, 3, 3> T1 = v2t( lastMapUpdatePose );
+                Eigen::Matrix<float, 3, 3> T2 = v2t( newPoseEstimated  );
+
+		// caculate the transformation in se(2)
+		Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
+		poseTransformVec = t2v( T );
+
 		// update the map only when the pose change is greater than the threshol
 		occupiedGridMap->updateByScan( scanContainer, newPoseEstimated );
 		// occupiedGridMap->onMapUpdate();
 		lastMapUpdatePose = newPoseEstimated;
 	}
 	
+}
+
+const Eigen::Vector3f& SlamProcessor::getPoseTransformVec() const
+{
+	return poseTransformVec;
 }
 
 bool SlamProcessor::poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew )
@@ -291,6 +304,31 @@ void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std:
 
 }
 
+const Eigen::Matrix<float, 3, 3>& SlamProcessor::v2t(Eigen::Vector3f &v)
+{
+	float c = cos( v(2) );
+        float s = sin( v(2) );
+
+        Eigen::Matrix<float, 3, 3> A;
+        A << c, -s, v(0),
+             s,  c, v(1),
+             0,  0,  1;
+
+        return A;
+}
+
+const Eigen::Vector3f& SlamProcessor::t2v(Eigen::Matrix<float, 3, 3> &A)
+{
+	Eigen::Vector3f v;
+        
+	v(0) = A(0, 2);
+        v(1) = A(1, 2);
+        v(2) = ::atan2( A( 1, 0 ), A(0, 0) );
+
+        return v;
+}
+
+
 void SlamProcessor::displayMap( cv::Mat &image, const std::vector<Eigen::Vector3f> &poses )
 {
         int occupiedCount = 0;
@@ -323,7 +361,7 @@ void SlamProcessor::displayMap( cv::Mat &image, const std::vector<Eigen::Vector3
 	for( auto it : poses ){
         	Eigen::Vector3f poseVec = occupiedGridMap->robotPoseWorld2Map( it );
 	        cv::Point2d pose( poseVec(0), poseVec(1) );
-        	cv::circle(image, pose, 3, cv::Scalar(0, 255, 0), -1);
+        	cv::circle( image, pose, 3, cv::Scalar(0, 255, 0), -1 );
 	}
         std::cout<<"---------------- Result --------------------"<<std::endl;
         std::cout<<"Occupied Points Number: "<<occupiedCount<<std::endl;

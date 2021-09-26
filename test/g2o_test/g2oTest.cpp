@@ -54,6 +54,30 @@ bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew )
 }
 
 
+Eigen::Matrix<float, 3, 3> v2t(Eigen::Vector3f &v)
+{
+	float c = ::cos( v(2) );
+	float s = ::sin( v(2) );
+
+	Eigen::Matrix<float, 3, 3> A;
+	A << c, -s, v(0),
+	     s,  c, v(1),
+	     0,  0,  1;
+
+	return A;
+}
+
+Eigen::Vector3f t2v(Eigen::Matrix<float, 3, 3> &A)
+{
+	Eigen::Vector3f v;
+	
+	v(0) = A(0, 2);
+	v(1) = A(1, 2);
+	v(2) = ::atan2( A( 1, 0 ), A(0, 0) );
+
+	return v;
+}
+
 int main()
 {
 	std::cout<<"--------------------- G2O Test --------------------"<<std::endl;
@@ -64,6 +88,8 @@ int main()
         slam::optimizer::GraphOptimize optimizer;
 
 	optimizer.createOptimizer();
+
+	optimizer.setMaxIeration(10);
 
 	std::string odom_file_name = "../../../../simulation_file/odometry2.txt";
  	if( !odomSim.openSimulationFile( odom_file_name ) ){
@@ -86,34 +112,60 @@ int main()
 
 		if( poseDiffLargerThan( poseOld, poseNew ) ){
                         std::cerr<<"------------------ UPDATE ----------------"<<std::endl;
-			std::cout<<"pose: "<<std::endl<<poseNew<<std::endl;
+			//std::cout<<"pose: "<<std::endl<<poseNew<<std::endl;
 			keyCount ++;	
 
 			if( keyCount == 0 ){
 				std::cout<<"keyCount = "<<keyCount <<std::endl;
+				std::cout<<"pose new: "<<std::endl<<poseNew<<std::endl;
+
                                 keyPoses.push_back( poseNew );
 
 				optimizer.addVertex( poseNew, keyCount ); // add a vertex
 			}
 			else{
-        	               std::cout<<"keyCount = "<<keyCount <<std::endl;
+        	                std::cout<<"keyCount = "<<keyCount <<std::endl;
                 	        keyPoses.push_back( poseNew );
 				
 				optimizer.addVertex( poseNew, keyCount ); // add a vertex
-
-				Eigen::Vector3f poseDiff = poseNew - poseOld;
-				std::cout<<"Pose Diff: "<<std::endl<<poseDiff<<std::endl;				
-
-				Eigen::Matrix3d information = 10 * Eigen::Matrix3d::Identity(); //information matrix
-				//std::cout<<"information matrix: "<<std::endl<<information<<std::endl;
+				std::cout<<"pose new: "<<std::endl<<poseNew<<std::endl;				
+				// -------------------------------------------//
 		
-                	        optimizer.addEdge( poseDiff, keyCount - 1, keyCount, information ); // add a edge
+				//Eigen::Vector3f poseDiff = poseNew - poseOld;
+				//std::cout<<"Pose Diff: "<<std::endl<<poseDiff<<std::endl;				
+				
+				Eigen::Matrix<float, 3, 3> T1 = v2t( poseOld );
+				Eigen::Matrix<float, 3, 3> T2 = v2t( poseNew );
+
+				Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
+				Eigen::Vector3f V = t2v( T );
+				std::cout<<"V = "<<std::endl<<V<<std::endl<<std::endl;	
+				//-------------------- END ----------------------//
+
+				Eigen::Matrix3d information = 1 * Eigen::Matrix3d::Identity(); //information matrix
+				//std::cout<<"information matrix: "<<std::endl<<information<<std::endl;
+				std::cout<<"edge: "<<keyCount - 1<<" to "<<keyCount<<std::endl;
+                	        optimizer.addEdge( V, keyCount - 1, keyCount, information ); // add a edge
 			}
 
-			if( keyCount % 130 == 0 && keyCount != 0 ){
-				std::cout<<"----------- execuate the graph optimization ----------"<<std::endl;
-                        	// execuate the graph optimization every 50 key points
+			//if( keyCount % 130 == 0 && keyCount != 0 ){
+                        if( keyCount == 127 ){
+				int loopId = 34;		
+				std::cout<<"loop pose new : "<<std::endl<<poseNew<<std::endl<<std::endl;				
+				std::cout<<"loop pose old : "<<std::endl<<keyPoses[loopId]<<std::endl<<std::endl;
+
+				Eigen::Matrix3d information = 1 * Eigen::Matrix3d::Identity(); //information matrix
+				Eigen::Matrix<float, 3, 3> T1 = v2t( poseNew );
+                                Eigen::Matrix<float, 3, 3> T2 = v2t( keyPoses[loopId] );
+
+                                Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
+                                Eigen::Vector3f V = t2v( T );
+
+				optimizer.addEdge( V, keyCount, loopId, information );
+				std::cout<<"Add A Loop Correlation ..."<<std::endl;			
 				
+				std::cout<<"----------- execuate the graph optimization ----------"<<std::endl;
+
                                 optimizer.execuateGraphOptimization();
 
                                 optimizer.getOptimizedResults();

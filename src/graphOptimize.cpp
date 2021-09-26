@@ -23,6 +23,8 @@ void GraphOptimize::createOptimizer()
 	g2o::OptimizationAlgorithmGaussNewton* solver = new g2o::OptimizationAlgorithmGaussNewton( g2o::make_unique<SlamBlockSolver>( std::move(linearSolver) ) );
 
 	optimizer.setAlgorithm(solver);
+	
+	optimizer.setVerbose(true);
 }
 
 void GraphOptimize::addVertex( const Eigen::Vector3f &pose, const int id )
@@ -43,12 +45,14 @@ void GraphOptimize::addEdge( const Eigen::Vector3f &delta,
                              const int to,  
                              Eigen::Matrix3d &information )
 {
+	edgeCount ++;
+
 	g2o::EdgeSE2 *edge = new g2o::EdgeSE2();
 	
 	edge->vertices()[0] = optimizer.vertex( from );
 	edge->vertices()[1] = optimizer.vertex( to );
 	
-	g2o::SE2 measurement( delta[0], delta[1], delta[2] );
+	g2o::SE2 measurement( delta(0), delta(1), delta(2) );
 	edge->setMeasurement( measurement );
 
 	edge->setId( edgeCount );
@@ -57,7 +61,7 @@ void GraphOptimize::addEdge( const Eigen::Vector3f &delta,
 	
 	optimizer.addEdge( edge );
 
-	edgeCount ++;
+	//edgeCount ++;
 	
 	std::cout<<"add a edge to the optimize ... edge count: "<<edgeCount<<std::endl;
 }
@@ -68,15 +72,14 @@ int GraphOptimize::execuateGraphOptimization()
         g2o::VertexSE2* firstRobotPose = dynamic_cast<g2o::VertexSE2*>(optimizer.vertex(0));
 	
 	firstRobotPose->setFixed(true);
-        optimizer.setVerbose(true);
 
 	optimizer.initializeOptimization();
 	
-	int iteration = 0;
+	int iter = 0;
 	
-	iteration = optimizer.optimize(100);
-
-	std::cout<<"execuate the graph optimization ... "<<std::endl;
+	iter = optimizer.optimize( iteration );
+	
+	std::cout<<"execuate the graph optimization ... actual iteration: "<< iter << std::endl;
 	
 	optimizer.save("./result.g2o");
 
@@ -111,6 +114,10 @@ void GraphOptimize::saveG2OFile( const std::string &filePath )
 	optimizer.save( filePath.c_str() );
 }
 
+void GraphOptimize::setMaxIeration( const int iteration )
+{
+	this->iteration = iteration;
+}
 
 }
 

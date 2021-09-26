@@ -51,10 +51,14 @@ public:
 
 	void saveG2OFile( const std::string &filePath  );
 
+	void setMaxIeration( const int iteration );
+
 private:
 	g2o::SparseOptimizer optimizer; // allocating the optimizer
 	
 	int edgeCount = 0;
+
+	int iteration = 20; // max iteration times
 
 	std::vector<Eigen::Vector3f> estimatedPoses;
 };

@@ -51,6 +51,10 @@ public:
 
 	bool isKeyFrame() const;
 
+	// added for getting the transformation vector between the new pose and the old one
+	const Eigen::Vector3f& getPoseTransformVec() const;
+	// ---------------------- Added -----------------------//
+
 	void reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, 
 			     std::vector<slam::sensor::LaserScan> &keyScans );
 
@@ -58,7 +62,11 @@ private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 
 	//void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container );
-
+	
+	const Eigen::Matrix<float, 3, 3>& v2t(Eigen::Vector3f &v);
+	
+	const Eigen::Vector3f& t2v(Eigen::Matrix<float, 3, 3> &A);
+	
 private:
 
 	// - Grid Map Object & Scan Match Object -//
@@ -76,6 +84,8 @@ private:
 	
 	Eigen::Vector3f poseDiff;
 	
+	Eigen::Vector3f poseTransformVec;
+
 	// ------------ opencv map -------------- //
 	//cv::Mat image;
 	
