@@ -13,6 +13,8 @@
 
 #include <opencv2/opencv.hpp>
 
+#include <map>
+
 namespace slam{
 
 
@@ -83,7 +85,7 @@ private:
 	const int NUM_RING = 20;
 	const int NUM_SECTOR = 60;
 	
-	const float MAX_RADIUS = 20.0f;
+	const float MAX_RADIUS = 15.0f;
 	const float UNIT_SECTOR_ANGLE = 360.0 / float(NUM_SECTOR);
 	const float UNIT_RING_GAP = MAX_RADIUS / float(NUM_RING);
 	
@@ -91,12 +93,12 @@ private:
 	
 	const int NUM_EXCLUDE_RECENT = 50;
 		
-	const int TREE_MAKING_PERIOD = 50;
+	const int TREE_MAKING_PERIOD = 20;
 	int tree_making_period_conter = 0;
 
 	const int    NUM_CANDIDATES_FROM_TREE = 10; // 10 is enough. (refer the IROS 18 paper)
 
-	const double SC_DIST_THRES = 0.13; // empirically 0.1-0.2 is fine (rare false-alarms) for 20x60 polar context (but for 0.15 <, DCS or ICP fit score check (e.g., in LeGO-LOAM) should be required for robustness)
+	const double SC_DIST_THRES = 0.16; // empirically 0.1-0.2 is fine (rare false-alarms) for 20x60 polar context (but for 0.15 <, DCS or ICP fit score check (e.g., in LeGO-LOAM) should be required for robustness)
 };	
 
 template<typename T, int Dimension>
@@ -111,7 +113,7 @@ ScanContext<T, Dimension>::~ScanContext()
 
 }
 
-template<typename T, int Dimension>
+/*template<typename T, int Dimension>
 const Eigen::MatrixXf ScanContext<T, Dimension>::makeScanContext( const slam::sensor::LaserScan &scan )
 {
 	// 1. 
@@ -124,7 +126,7 @@ const Eigen::MatrixXf ScanContext<T, Dimension>::makeScanContext( const slam::se
 		float dist = scan.ranges[i];
 		float angle = rad2deg<float>( radians ) + 180.0f;
 		
-		if( dist >= 0.009999998f && dist <= 20.0000000000f ){
+		if( dist >= 0.009999998f && dist <= 15.0000000000f ){
 			//std::cout<<"------------------------------------"<<std::endl;
 			//std::cout<<"dist = "<<dist<<", angle = "<<angle<<std::endl;
 			
@@ -134,15 +136,149 @@ const Eigen::MatrixXf ScanContext<T, Dimension>::makeScanContext( const slam::se
 			
 			//std::cout<<"ring_idx: "<<ring_idx<<", sctor_idx: "<<sctor_idx<<std::endl;
 
-			desc(ring_idx, sctor_idx) += 1;
+			desc(ring_idx, sctor_idx) += 0.5f;
 		
 			//std::cout<<"( ring_idx, sector_idx ): ( " <<ring_idx<<", "<<sctor_idx<<" ) = " <<desc(ring_idx, sctor_idx)<<std::endl;
 		}
 
-		radians += 0.0043542264f;
+		radians += 0.0043633231f;
 	}
 
 	return desc;
+}*/
+
+/*
+template<typename T, int Dimension>
+const Eigen::MatrixXf ScanContext<T, Dimension>::makeScanContext( const slam::sensor::LaserScan &scan )
+{
+        // 1. 
+        Eigen::MatrixXf desc = Eigen::MatrixXf::Zero(NUM_RING, NUM_SECTOR);
+        
+	std::map<Eigen::Vector2i, Eigen::Vector2f> avarage;
+	std::map<Eigen::Vector2i, int> avarage_num;
+	std::map<Eigen::Vector2i, Eigen::Matrix<float, 2, 2>> covarince;
+
+	int ring_idx = 0, sctor_idx = 0;
+        float radians = -3.14159f;
+        
+        for( int i = 0; i < scan.size(); i ++ ){
+                float dist = scan.ranges[i];
+                float angle = rad2deg<float>( radians ) + 180.0f;
+                
+                if( dist >= 0.009999998f && dist <= 15.0000000000f ){
+                        
+                        ring_idx = std::max( std::min( NUM_RING - 1, int(ceil( (dist / MAX_RADIUS) * NUM_RING )) ), 0 );
+                
+                        sctor_idx = std::max( std::min( NUM_SECTOR - 1, int(ceil( (angle / 360.0) * NUM_SECTOR )) ), 0 );
+                        
+
+                       // desc(ring_idx, sctor_idx) += 0.5f;
+        		
+			Eigen::Vector2f point( radians + M_PI, dist );        
+			Eigen::Vector2f key( ring_idx, sctor_idx );		
+	
+			if( !avarage.count( key ) ){
+				avarage.insert( std::make_pair( key, point ) );
+			}
+			else {
+				avarage[key] += point;
+			}
+
+			if( !avarage_num.count( key ) ){
+				avarage_num.insert( std::make_pair( key, 1 ) );
+			}
+			else {
+				avarage_num[key] += 1;
+			}
+                }
+
+                radians += 0.0043633231f;
+        }
+
+	for( auto it : avarage ){
+		if( avarage_num.count( it.first ) ){
+			it.second /= avarage_num[it.first];
+		}
+	}
+
+	for( int i = 0; i < scan.size(); i ++ ){
+                float dist = scan.ranges[i];
+                float angle = rad2deg<float>( radians ) + 180.0f;
+
+                if( dist >= 0.009999998f && dist <= 15.0000000000f ){
+
+                        ring_idx = std::max( std::min( NUM_RING - 1, int(ceil( (dist / MAX_RADIUS) * NUM_RING )) ), 0 );
+
+                        sctor_idx = std::max( std::min( NUM_SECTOR - 1, int(ceil( (angle / 360.0) * NUM_SECTOR )) ), 0 );
+
+                        Eigen::Vector2f point( radians + M_PI, dist );
+                        Eigen::Vector2f key( ring_idx, sctor_idx );
+                
+			if( !avarage.count( key ) ){
+				Eigen::Matrix<float, 2, 2> cov = ( point - avarage[key] ) * ( point - avarage[key] ).transpose();
+				covarince.insert( std::make_pair( key, cov ) );
+			}
+			else{
+				covarince[key] += ( point - avarage[key] ) * ( point - avarage[key] ).transpose();
+			}
+		}
+
+                radians += 0.0043633231f;
+        }
+
+	for( auto it : covarince ){
+                if( avarage_num.count( it.first ) ){
+                        it.second /= avarage_num[it.first];
+                }
+        }
+
+        return desc;
+}*/
+
+template<typename T, int Dimension>
+const Eigen::MatrixXf ScanContext<T, Dimension>::makeScanContext( const slam::sensor::LaserScan &scan )
+{
+        // 1. 
+        Eigen::MatrixXf desc = Eigen::MatrixXf::Zero(NUM_RING, NUM_SECTOR);
+
+
+        int ring_idx = 0, sctor_idx = 0;
+        float radians = -3.14159f;
+        
+        for( int i = 0; i < scan.size(); i ++ ){
+                float dist = scan.ranges[i];
+                float angle = rad2deg<float>( radians ) + 180.0f;
+                
+                if( dist >= 0.009999998f && dist <= 15.0000000000f ){
+                        
+                        ring_idx = std::max( std::min( NUM_RING - 1, int(ceil( (dist / MAX_RADIUS) * NUM_RING )) ), 0 );
+                
+                        sctor_idx = std::max( std::min( NUM_SECTOR - 1, int(ceil( (angle / 360.0) * NUM_SECTOR )) ), 0 );
+        	
+                
+			desc( ring_idx, sctor_idx ) += 1;
+		}
+
+                radians += 0.0043633231f;
+        }
+
+	//std::cout<<"desc : "<<std::endl<<desc<<std::endl;
+	
+	for( int i = 0; i < desc.rows(); i ++ ){
+		for( int j = 0; j < desc.cols(); j ++ ){
+			float index = desc(i, j);
+			if( index > 2 ){
+				desc(i, j) = index * 2;
+			}
+			else{
+				desc(i, j) = index * 0.1;
+			}
+		}
+	}	
+
+	//std::cout<<" make a frame of scan context "<<std::endl;
+	
+        return desc;
 }
 
 template<typename T, int Dimension>
@@ -310,7 +446,7 @@ const std::pair<int, float> ScanContext<T, Dimension>::detectLoopClosureID()
 		
 		kdTree.reset();
 		kdTree = std::make_unique<myKDTree>( Dimension, ringKeysMat, 10 );
-		std::cout<<" Reconstruct the kd tree ..................... "<<std::endl;
+		std::cout<<"-------------- Reconstruct the kd tree ............... "<<std::endl;
 	}
 	tree_making_period_conter += 1;
 	std::cout<<"Tree Making Period Counter : "<<tree_making_period_conter<<std::endl;	
