@@ -77,6 +77,7 @@ int GraphOptimize::execuateGraphOptimization()
 	
 	int iter = 0;
 	
+
 	iter = optimizer.optimize( iteration );
 	
 	std::cout<<"execuate the graph optimization ... actual iteration: "<< iter << std::endl;

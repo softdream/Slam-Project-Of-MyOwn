@@ -98,7 +98,7 @@ private:
 
 	const int    NUM_CANDIDATES_FROM_TREE = 10; // 10 is enough. (refer the IROS 18 paper)
 
-	const double SC_DIST_THRES = 0.16; // empirically 0.1-0.2 is fine (rare false-alarms) for 20x60 polar context (but for 0.15 <, DCS or ICP fit score check (e.g., in LeGO-LOAM) should be required for robustness)
+	const double SC_DIST_THRES = 0.17; // empirically 0.1-0.2 is fine (rare false-alarms) for 20x60 polar context (but for 0.15 <, DCS or ICP fit score check (e.g., in LeGO-LOAM) should be required for robustness)
 };	
 
 template<typename T, int Dimension>
@@ -267,11 +267,14 @@ const Eigen::MatrixXf ScanContext<T, Dimension>::makeScanContext( const slam::se
 	for( int i = 0; i < desc.rows(); i ++ ){
 		for( int j = 0; j < desc.cols(); j ++ ){
 			float index = desc(i, j);
-			if( index > 2 ){
-				desc(i, j) = index * 2;
+			if( index <= 1 ){
+				desc(i, j) = index * 0.1;
+			}
+			if( index == 2 ){
+				desc(i, j) = index * 1;
 			}
 			else{
-				desc(i, j) = index * 0.1;
+				desc(i, j) = index * 3;
 			}
 		}
 	}	

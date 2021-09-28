@@ -43,6 +43,9 @@ int main()
 	
 	// g2o instance
 	slam::optimizer::GraphOptimize optimizer;
+	optimizer.createOptimizer();
+        optimizer.setMaxIeration(10);
+		
 
 	// print the map information
 	std::cout<<"------------- Map Information ----------------"<<std::endl;
@@ -61,7 +64,7 @@ int main()
 	cv::imshow("map", image);
 	
 	// open the simulation file
-	std::string file_name = "../../../simulation_file/laser_data.txt";
+	std::string file_name = "../../../../simulation_file/laser_data.txt";
 	simulation.openSimulationFile( file_name );
 
 	// convarince
@@ -69,7 +72,7 @@ int main()
 
 	// robot pose
 	Eigen::Vector3f robotPosePrev( 0.0f, 0.0f, 0.0f );
-//	Eigen::Vector3f robotPoseCurr( 0.0f, 0.0f, 0.0f );
+	Eigen::Vector3f robotPoseCurr( 0.0f, 0.0f, 0.0f );
 
 	// slam process
 	// while it is not the end of the simulation file
@@ -89,89 +92,107 @@ int main()
 	
 		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;	
 		if( simulation.getFrameCount() <= 10  ){
-			slam.processTheFirstScan( robotPosePrev, scanContainer );
+			slam.processTheFirstScan( robotPoseCurr, scanContainer );
+
 			if( simulation.getFrameCount() == 10 ){
 				// initial key pose and key scan
 				keyScans.push_back( scan );
-                        	keyPoses.push_back( robotPosePrev );
+                        	keyPoses.push_back( robotPoseCurr );
 				
-				optimizer.addVertex( robotPosePrev, keyFrameCount );
+				optimizer.addVertex( robotPoseCurr, keyFrameCount );
+		
+				robotPosePrev = robotPoseCurr;
+				slam.displayMap( image );
 			}
 		}
 		else{
 	
 			// 1. Update by Scan Match, get the estimated pose 
-			slam.update( robotPosePrev, scanContainer );
+			slam.update( robotPoseCurr, scanContainer );
 		
 			// 2. get the newest robot pose in world coordinate	
-			robotPosePrev = slam.getLastScanMatchPose();
+			robotPoseCurr = slam.getLastScanMatchPose();
 			std::cout<<"robot pose now: "<<std::endl;
-			std::cout<<robotPosePrev<<std::endl;
+			std::cout<<robotPoseCurr<<std::endl;
 			std::cout<<"------------------"<<std::endl;
 			
 			// 3. if this is a key scan frame
 			if( slam.isKeyFrame() ){
 				std::cerr<<"--------------------- Key Frame : "<<keyFrameCount <<"-----------------------"<<std::endl;
+
 				keyFrameCount ++;			
 				std::cout<<"key frame count : "<<keyFrameCount<<std::endl;			
 
-				//keyScans.push_back( scan );
-				keyPoses.push_back( robotPosePrev );
+				keyPoses.push_back( robotPoseCurr );
 				
-				optimizer.addVertex( robotPosePrev, keyFrameCount ); // add a vertex
+				// -------------------- For G2O ---------------------//
+				optimizer.addVertex( robotPoseCurr, keyFrameCount ); // add a vertex
 				Eigen::Matrix3d information = Eigen::Matrix3d::Identity(); //information matrix
+	
+				Eigen::Matrix<float, 3, 3> T1 = slam.v2t( robotPosePrev );
+                                Eigen::Matrix<float, 3, 3> T2 = slam.v2t( robotPoseCurr );
+
+                                Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
+                                Eigen::Vector3f V = slam.t2v( T );
+                                std::cout<<"V = "<<std::endl<<V<<std::endl<<std::endl;
+	
+				std::cout<<"edge: "<<keyFrameCount - 1<<" to "<<keyFrameCount<<std::endl;
+                                optimizer.addEdge( V, keyFrameCount - 1, keyFrameCount, information ); // add a edge
+
+
+				// ---------------------- END ----------------------//
 		
-				optimizer.addEdge( slam.getPoseDifferenceValue(), keyFrameCount - 1, keyFrameCount, information ); // add a edge
-		
+				// ---------------------- For Loop Closure -------------------//
 				loopDetect->detectLoop( scan ); // loop detect
 				
 				int loopId = loopDetect->detectedALoop();
 				if( loopId != -1 ){
-					// TODO ... Caculate the loop correlation
-					//loopDetect->caculateTransformByICP();
-					
-					if( ( robotPosePrev - keyPoses[loopId] ).head<2>() > 1.0f ){
+					cv::line( image, cv::Point2f( robotPoseCurr(0), robotPoseCurr(1) ),
+                                                 cv::Point2f( keyPoses[loopId](0), keyPoses[loopId](1) ),
+                                                 cv::Scalar( 0, 255, 0 ), 1 );
+
+					if( ( robotPosePrev - keyPoses[loopId] ).head<2>().norm() > 2.0f ){
 						std::cout<<"loop closure is too large ..."<<std::endl;
 						continue;
 					}
-					std::cout<<"Find A Loop Closure ..."<<std::endl;
-					
-					// TODO ...
-					Eigen::Vector3f loopPoseDiff( 0.0f, 0.0f, 0.0f );
-
-					optimizer.addEdge( loopPoseDiff, keyFrameCount, loopId, information );
+					std::cout<<"-------------------------- Find A Loop Closure --------------------------"<<std::endl;
+					std::cout<<"Pose Current: "<<std::endl<<robotPoseCurr<<std::endl;
+					std::cout<<"Pose Loop: "<<std::endl<<keyPoses[loopId]<<std::endl;
+					std::cout<<"-------------------------------------------------------------------------"<<std::endl;
 				
-					optimizer.execuateGraphOptimization();
-					
-					optimizer.getOptimizedResults();
-		
-					std::vector<Eigen::Vector3f> estimatedPoses = optimizer.getEstimatedPoses();
-					std::cout<<"keyPoses.size  = "<<keyPoses.size()<<std::endl;
-					std::cout<<"estimatedPoses.size = "<<estimatedPoses.size()<<std::endl;
+					Eigen::Matrix3d information = 1 * Eigen::Matrix3d::Identity(); //information matrix
+	                                Eigen::Matrix<float, 3, 3> T1 = slam.v2t( robotPoseCurr );
+        	                        Eigen::Matrix<float, 3, 3> T2 = slam.v2t( keyPoses[loopId] );
 
-					// TODO ... process the estimated results
-					//keyPoses.erase( keyPoses.begin() + loopId, keyPoses.end() );
-	
-					//keyPoses.insert( keyPoses.end(), estimatedPoses.begin(), estimatedPoses.end() );
-				
+                	                Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
+                        	        Eigen::Vector3f V = slam.t2v( T );
+
+                                	optimizer.addEdge( V, keyFrameCount, loopId, information );
+	                                std::cout<<"Add A Loop Correlation ..."<<std::endl;
+					std::cout<<"----------- execuate the graph optimization ----------"<<std::endl;
+
+	                                optimizer.execuateGraphOptimization();
+
+        	                        optimizer.getOptimizedResults();
+
+                	                std::vector<Eigen::Vector3f> estimatedPoses = optimizer.getEstimatedPoses();
+                        	        std::cout<<"keyPoses.size  = "<<keyPoses.size()<<std::endl;
+                                	std::cout<<"estimatedPoses.size = "<<estimatedPoses.size()<<std::endl;
+                                	// TODO ... process the estimated results
+
+                                	break;
 				}
-				else if( keyFrameCount % 50 == 0 ){
-					// execuate the graph optimization every 50 key points
-					optimizer.execuateGraphOptimization();
-
-                                        optimizer.getOptimizedResults();
-
-                                        std::vector<Eigen::Vector3f> estimatedPoses = optimizer.getEstimatedPoses();
-                                        std::cout<<"keyPoses.size  = "<<keyPoses.size()<<std::endl;
-                                        std::cout<<"estimatedPoses.size = "<<estimatedPoses.size()<<std::endl;
-					// TODO ... process the estimated results
-				}
+				// ---------------------- END ----------------------//
+			
+				robotPosePrev = robotPoseCurr;
+			
+				slam.displayMap( image );
 			}
 			
 
 		}
 		// 3. display the map
-		slam.displayMap( image );
+		//slam.displayMap( image );
 		
 		cv::waitKey(5);	
 	}

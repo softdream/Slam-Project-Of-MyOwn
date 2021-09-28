@@ -116,13 +116,6 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 		// if pose change is greater than the threshold, then this is a Key scan Frame
 		keyFrame = true;
 
-		// caculate the transformation from lastMapUpdatePose to newPoseEstimated
-		Eigen::Matrix<float, 3, 3> T1 = v2t( lastMapUpdatePose );
-                Eigen::Matrix<float, 3, 3> T2 = v2t( newPoseEstimated  );
-
-		// caculate the transformation in se(2)
-		Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
-		poseTransformVec = t2v( T );
 
 		// update the map only when the pose change is greater than the threshol
 		occupiedGridMap->updateByScan( scanContainer, newPoseEstimated );
@@ -132,10 +125,6 @@ void SlamProcessor::update( Eigen::Vector3f &robotPoseInWorld,
 	
 }
 
-const Eigen::Vector3f& SlamProcessor::getPoseTransformVec() const
-{
-	return poseTransformVec;
-}
 
 bool SlamProcessor::poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew )
 {
@@ -304,7 +293,7 @@ void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std:
 
 }
 
-const Eigen::Matrix<float, 3, 3>& SlamProcessor::v2t(Eigen::Vector3f &v)
+const Eigen::Matrix<float, 3, 3> SlamProcessor::v2t(Eigen::Vector3f &v)
 {
 	float c = cos( v(2) );
         float s = sin( v(2) );
@@ -317,7 +306,7 @@ const Eigen::Matrix<float, 3, 3>& SlamProcessor::v2t(Eigen::Vector3f &v)
         return A;
 }
 
-const Eigen::Vector3f& SlamProcessor::t2v(Eigen::Matrix<float, 3, 3> &A)
+const Eigen::Vector3f SlamProcessor::t2v(Eigen::Matrix<float, 3, 3> &A)
 {
 	Eigen::Vector3f v;
         
