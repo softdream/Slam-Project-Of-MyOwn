@@ -143,6 +143,7 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>使用Scan Context进行回环检测的思路是将所有激光扫描帧转化为Scan Context, 然后提取出每一个Scan Context的特征，称之为Ring Key并将其加入到KD树(K-Dimension Tree)中，当新的扫描帧加入时使用近似最邻近查找(Approximate Nearest Neighbor Search)算法查找出余弦距离最近的扫描帧，如果距离小于阈值则判断检测到了回环，再使用一步ICP算法求出两个回环帧间的坐标变换关系。<br>
   >>回环检测的结果如下：<br>
   ![loop closure detect](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/loop_closure_detect.png)<br>
+  >>其中绿色的线表示找到了回环。<br>
  
 #### 3.3.2 图优化方法(待验证)
   >>图优化的目的是从整体上对所有已估计到的并且在回环上的位姿进行优化，减小误差。图优化的思路是将位姿作为图(Graph)的顶点(Vertex),位姿间的坐标变换关系作为边(Edge), 顶点为优化变量，边为优化约束，构建出一个位姿图(Pose Graph)。有些时候需要将雷达观测点也作为图的顶点，观测点与机器人的位姿之间的关系也作为边构建出一个图，这种情况下称之为Bundle Adjustment(BA)问题，这里不做考虑。<br>
@@ -150,7 +151,7 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>本项目准备使用谷歌开源的g2o(General Graph Optimization)库来处理位姿图优化问题。<br>
   >>使用图优化后的结果如下所示：<br>
   ![G2O Result](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/g2o_result.png)<br>
-  >>其中绿色的线表示找到了回环。<br>
+ 
 
 ------------------------------------------------------------------------------------------------------------------------------------<br/>
 ## 1.  Developement Environment
