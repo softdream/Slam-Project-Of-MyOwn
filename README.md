@@ -150,6 +150,7 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>本项目准备使用谷歌开源的g2o(General Graph Optimization)库来处理位姿图优化问题。<br>
   >>使用图优化后的结果如下所示：<br>
   ![G2O Result](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/g2o_result.png)<br>
+  >>其中绿色的线表示找到了回环。<br>
 
 ------------------------------------------------------------------------------------------------------------------------------------<br/>
 ## 1.  Developement Environment
