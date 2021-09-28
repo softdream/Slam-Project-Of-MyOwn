@@ -62,9 +62,12 @@ private:
 	//void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container );
 	
 public:
-	const Eigen::Matrix<float, 3, 3> v2t(Eigen::Vector3f &v);
+	const Eigen::Matrix<float, 3, 3> v2t(const Eigen::Vector3f &v);
 	
-	const Eigen::Vector3f t2v(Eigen::Matrix<float, 3, 3> &A);
+	const Eigen::Vector3f t2v(const Eigen::Matrix<float, 3, 3> &A);
+	
+	// ----- Added for caculating the transformation between two poses ----- //
+	const Eigen::Vector3f getContraintBetweenTwoPoints( const Eigen::Vector3f &pose1, const Eigen::Vector3f &pose2 );
 	
 private:
 

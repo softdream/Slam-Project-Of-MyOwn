@@ -17,7 +17,7 @@
 
 namespace slam{
 
-
+// just for visulizing the scan context, not important
 static const unsigned char r[64] = { 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   10,  20,  30,  40,  50,  60,  70,  80,  90,  100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
 static const unsigned char g[64] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 240, 230, 220, 210, 200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100, 90,  80,  70,  60,  50,  40,  30,  20,  10,  0 };
 static const unsigned char b[64] = { 255, 240, 220, 200, 180, 160, 140, 120, 100, 80,  60,  40,  20,  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 };
@@ -33,6 +33,11 @@ class ScanContext
 
 public:
 	ScanContext();
+	ScanContext( int NUM_RING_, int NUM_SECTOR_, float MAX_RADIUS_, 
+		     float SEARCH_RATIO_, int NUM_EXCLUDE_RECENT_, 
+		     int TREE_MAKING_PERIOD_, int NUM_CANDIDATES_FROM_TREE_, 
+		     double SC_DIST_THRES_ );
+
 	~ScanContext();
 
 	const Eigen::MatrixXf makeScanContext( const slam::sensor::LaserScan &scan );
@@ -73,6 +78,11 @@ public:
 	
 	void displayScanDistribution( const slam::sensor::LaserScan &scan );
 
+	void setParameters( int NUM_RING_, int NUM_SECTOR_, float MAX_RADIUS_,
+                     	    float SEARCH_RATIO_, int NUM_EXCLUDE_RECENT_,
+     			    int TREE_MAKING_PERIOD_, int NUM_CANDIDATES_FROM_TREE_,
+        		    double SC_DIST_THRES_  );
+
 private:	
 	myVectors ringKeysMat;	
 
@@ -82,7 +92,7 @@ private:
 
 	std::unique_ptr<myKDTree> kdTree;
 
-	const int NUM_RING = 20;
+	/*const int NUM_RING = 20;
 	const int NUM_SECTOR = 60;
 	
 	const float MAX_RADIUS = 15.0f;
@@ -99,6 +109,29 @@ private:
 	const int    NUM_CANDIDATES_FROM_TREE = 10; // 10 is enough. (refer the IROS 18 paper)
 
 	const double SC_DIST_THRES = 0.17; // empirically 0.1-0.2 is fine (rare false-alarms) for 20x60 polar context (but for 0.15 <, DCS or ICP fit score check (e.g., in LeGO-LOAM) should be required for robustness)
+	*/
+	
+	// ---------------------- Scan Context Parameters ------------------- //
+	// need to be changed according to your actual applications
+	int NUM_RING = 20;
+        int NUM_SECTOR = 60;
+
+        float MAX_RADIUS = 15.0f;
+        float UNIT_SECTOR_ANGLE = 360.0 / float(NUM_SECTOR);
+        float UNIT_RING_GAP = MAX_RADIUS / float(NUM_RING);
+
+        float SEARCH_RATIO = 0.1;
+
+        int NUM_EXCLUDE_RECENT = 50;
+
+        int TREE_MAKING_PERIOD = 20;
+        int tree_making_period_conter = 0;
+
+        int    NUM_CANDIDATES_FROM_TREE = 10; // 10 is enough. (refer the IROS 18 paper)
+
+        double SC_DIST_THRES = 0.17; // empirically 0.1-0.2 is fine (rare false-alarms) for 20x60 polar context (but for 0.15 <, DCS or ICP fit score check (e.g., in LeGO-LOAM) should be required for robustness)
+
+	// ----------------------------- END -------------------------------//
 };	
 
 template<typename T, int Dimension>
@@ -111,6 +144,35 @@ template<typename T, int Dimension>
 ScanContext<T, Dimension>::~ScanContext()
 {
 
+}
+
+template<typename T, int Dimension>
+ScanContext<T, Dimension>::ScanContext( int NUM_RING_, int NUM_SECTOR_, float MAX_RADIUS_,
+                     			float SEARCH_RATIO_, int NUM_EXCLUDE_RECENT_,
+                     			int TREE_MAKING_PERIOD_, int NUM_CANDIDATES_FROM_TREE_,
+                     			double SC_DIST_THRES_ ) : 
+					NUM_RING( NUM_RING_ ), NUM_SECTOR( NUM_SECTOR_ ), MAX_RADIUS( MAX_RADIUS_ ),
+					SEARCH_RATIO( SEARCH_RATIO_ ), NUM_EXCLUDE_RECENT( NUM_EXCLUDE_RECENT_ ),
+					TREE_MAKING_PERIOD( TREE_MAKING_PERIOD_ ), NUM_CANDIDATES_FROM_TREE( NUM_CANDIDATES_FROM_TREE_ ),
+					SC_DIST_THRES( SC_DIST_THRES_ )
+{
+	
+}
+
+template<typename T, int Dimension>
+void ScanContext<T, Dimension>::setParameters( int NUM_RING_, int NUM_SECTOR_, float MAX_RADIUS_,
+					       float SEARCH_RATIO_, int NUM_EXCLUDE_RECENT_,
+                            		       int TREE_MAKING_PERIOD_, int NUM_CANDIDATES_FROM_TREE_,
+                            		       double SC_DIST_THRES_  )
+{
+	NUM_RING = NUM_RING_;
+	NUM_SECTOR = NUM_SECTOR_;
+	MAX_RADIUS = MAX_RADIUS_;
+	SEARCH_RATIO = SEARCH_RATIO_;
+	NUM_EXCLUDE_RECENT = NUM_EXCLUDE_RECENT_;
+	TREE_MAKING_PERIOD = TREE_MAKING_PERIOD_;
+	NUM_CANDIDATES_FROM_TREE = NUM_CANDIDATES_FROM_TREE_;
+	SC_DIST_THRES = SC_DIST_THRES_;
 }
 
 /*template<typename T, int Dimension>

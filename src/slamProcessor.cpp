@@ -293,10 +293,10 @@ void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std:
 
 }
 
-const Eigen::Matrix<float, 3, 3> SlamProcessor::v2t(Eigen::Vector3f &v)
+const Eigen::Matrix<float, 3, 3> SlamProcessor::v2t(const Eigen::Vector3f &v)
 {
-	float c = cos( v(2) );
-        float s = sin( v(2) );
+	float c = ::cos( v(2) );
+        float s = ::sin( v(2) );
 
         Eigen::Matrix<float, 3, 3> A;
         A << c, -s, v(0),
@@ -306,7 +306,7 @@ const Eigen::Matrix<float, 3, 3> SlamProcessor::v2t(Eigen::Vector3f &v)
         return A;
 }
 
-const Eigen::Vector3f SlamProcessor::t2v(Eigen::Matrix<float, 3, 3> &A)
+const Eigen::Vector3f SlamProcessor::t2v(const Eigen::Matrix<float, 3, 3> &A)
 {
 	Eigen::Vector3f v;
         
@@ -359,6 +359,19 @@ void SlamProcessor::displayMap( cv::Mat &image, const std::vector<Eigen::Vector3
 
 }
 
+
+const Eigen::Vector3f SlamProcessor::getContraintBetweenTwoPoints( const Eigen::Vector3f &pose1, const Eigen::Vector3f &pose2 )
+{
+	Eigen::Matrix<float, 3, 3> T1 = v2t( pose1 );
+        Eigen::Matrix<float, 3, 3> T2 = v2t( pose2 );
+
+        Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
+        Eigen::Vector3f V = t2v( T );
+        
+	std::cout<<"V = "<<std::endl<<V<<std::endl<<std::endl;
+
+	return V;
+}
 
 
 } // end of namespace slam
