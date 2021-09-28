@@ -149,7 +149,7 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>图优化的目的是从整体上对所有已估计到的并且在回环上的位姿进行优化，减小误差。图优化的思路是将位姿作为图(Graph)的顶点(Vertex),位姿间的坐标变换关系作为边(Edge), 顶点为优化变量，边为优化约束，构建出一个位姿图(Pose Graph)。有些时候需要将雷达观测点也作为图的顶点，观测点与机器人的位姿之间的关系也作为边构建出一个图，这种情况下称之为Bundle Adjustment(BA)问题，这里不做考虑。<br>
   >>图优化问题，实质上也是一个非线性最小二乘问题，只不过随着机器人的移动，位姿点会越来越多，此时构建的优化方程的规模会越来越大，使用高斯牛顿法无法直接对其求解。现有的解决方案是对求出的海森矩阵(Hessain Matrix)进行乔利斯基分解(Choleski Decomposition)，降低海森矩阵的规模，再使用高斯牛顿法进行求解即可。<br>
   >>本项目准备使用谷歌开源的g2o(General Graph Optimization)库来处理位姿图优化问题。<br>
-  >>使用图优化后的结果如下所示：<br>
+  >>使用图优化后的位姿信息结果如下所示：<br>
   ![G2O Result](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/g2o_result.png)<br>
  
 
