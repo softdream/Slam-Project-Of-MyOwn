@@ -14,7 +14,11 @@ class LoadMap
 public:	
 	LoadMap();
 	~LoadMap();
+	
+	// Functor
+	const OccupiedMap& operator()( const std::string &fileName);
 
+private:
 	bool openMapFile( const std::string &fileName );
         void closeMapFile();
 

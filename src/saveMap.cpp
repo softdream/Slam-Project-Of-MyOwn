@@ -84,4 +84,27 @@ bool SaveMap::saveGridOccupiedMap()
 
 }
 
+bool SaveMap::operator()( const std::string &fileName, const OccupiedMap &map )
+{
+	// 1. open the file 
+	if( !openMapFile( fileName ) ){
+		return false;
+	}
+
+	// 2. set the input occupied grid map
+	setInputMapData( map );
+	
+
+	// 3. save the occupied grid map
+	if( !saveGridOccupiedMap() ){
+		return false;
+	}
+
+	// 4. close the file
+	closeMapFile();	
+
+	return true;
+
+}
+
 }
