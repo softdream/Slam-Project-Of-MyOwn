@@ -123,7 +123,7 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
  本项目采用Scan To Map的方法。参考了开源项目hector slam。
   
 ### 3.3 SLAM后端
-#### 3.3.1 回环检测方法(待验证)
+#### 3.3.1 回环检测方法(已解决)
   >>回环检测(Loop Closure Detection)是用来检测机器人有没有在某一时刻运动到之前到过的点，如果是则构成一个回环，一个回环是一个强约束，通常与图优化方法相结合，用来对回环上的所有位姿估计进行优化，消除累计误差。<br>
   >>2d激光slam的回环检测方法有：<br>
   >>1. 基于特征的匹配<br>
@@ -145,12 +145,15 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   ![loop closure detect](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/loop_closure_detect.png)<br>
   >>其中绿色的线表示找到了回环。<br>
  
-#### 3.3.2 图优化方法(待验证)
+#### 3.3.2 图优化方法(已解决)
   >>图优化的目的是从整体上对所有已估计到的并且在回环上的位姿进行优化，减小误差。图优化的思路是将位姿作为图(Graph)的顶点(Vertex),位姿间的坐标变换关系作为边(Edge), 顶点为优化变量，边为优化约束，构建出一个位姿图(Pose Graph)。有些时候需要将雷达观测点也作为图的顶点，观测点与机器人的位姿之间的关系也作为边构建出一个图，这种情况下称之为Bundle Adjustment(BA)问题，这里不做考虑。<br>
   >>图优化问题，实质上也是一个非线性最小二乘问题，只不过随着机器人的移动，位姿点会越来越多，此时构建的优化方程的规模会越来越大，使用高斯牛顿法无法直接对其求解。现有的解决方案是对求出的海森矩阵(Hessain Matrix)进行乔利斯基分解(Choleski Decomposition)，降低海森矩阵的规模，再使用高斯牛顿法进行求解即可。<br>
   >>本项目准备使用谷歌开源的g2o(General Graph Optimization)库来处理位姿图优化问题。<br>
-  >>使用图优化后的位姿信息结果如下所示：<br>
+  >>使用图优化后的位姿图关系如下所示：<br>
   ![G2O Result](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/g2o_result.png)<br>
+### 最终结果
+  >> 最终效果如下图所示：<br>
+  
  
 
 ------------------------------------------------------------------------------------------------------------------------------------<br/>
