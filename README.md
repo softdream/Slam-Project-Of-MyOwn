@@ -154,7 +154,8 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   ![G2O Result](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/g2o_result.png)<br>
 ### 最终结果
   >> 最终效果如下图所示：<br>
-  
+  ![Result Map](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/map.png)<br>
+  >> 其中绿色的点为估计出的机器人位姿轨迹。<br>
  
 
 ------------------------------------------------------------------------------------------------------------------------------------<br/>
