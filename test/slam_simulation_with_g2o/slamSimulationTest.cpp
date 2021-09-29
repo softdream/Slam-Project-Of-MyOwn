@@ -78,7 +78,8 @@ int main()
 	// while it is not the end of the simulation file
 	int keyFrameCount = 0;
 	
-	std::vector<slam::sensor::LaserScan> keyScans;
+
+	std::vector<slam::ScanContainer> keyScanContainers;
 	std::vector<Eigen::Vector3f> keyPoses;
 
 	while( !simulation.endOfFile() ){
@@ -96,16 +97,18 @@ int main()
 
 			if( simulation.getFrameCount() == 10 ){
 				// initial key pose and key scan
-				keyScans.push_back( scan );
-                        	keyPoses.push_back( robotPoseCurr );
-				
-				optimizer.addVertex( robotPoseCurr, keyFrameCount );
+                        	
+				keyPoses.push_back( robotPoseCurr ); // initial key pose
+				keyScanContainers.push_back( scanContainer ); // initial key scan container		
 		
-				robotPosePrev = robotPoseCurr;
-				slam.displayMap( image );
+				optimizer.addVertex( robotPoseCurr, keyFrameCount ); // the first vertex of the pose graph
+		
+				robotPosePrev = robotPoseCurr; // update the pose of robot
+
+				slam.displayMap( image ); // display the map
 			}
 		}
-		else{
+		else {
 	
 			// 1. Update by Scan Match, get the estimated pose 
 			slam.update( robotPoseCurr, scanContainer );
@@ -123,9 +126,10 @@ int main()
 				keyFrameCount ++;			
 				std::cout<<"key frame count : "<<keyFrameCount<<std::endl;			
 
-				keyPoses.push_back( robotPoseCurr );
-				
-				// -------------------- For G2O ---------------------//
+				keyPoses.push_back( robotPoseCurr ); // key pose 
+				keyScanContainers.push_back( scanContainer ); // key scan container		
+			
+				// ------------------------------ For G2O ------------------------------------//
 				optimizer.addVertex( robotPoseCurr, keyFrameCount ); // add a vertex
 				Eigen::Matrix3d information = Eigen::Matrix3d::Identity(); //information matrix
 	
@@ -140,21 +144,25 @@ int main()
                                 optimizer.addEdge( V, keyFrameCount - 1, keyFrameCount, information ); // add a edge
 
 
-				// ---------------------- END ----------------------//
+				// -------------------------------- END ------------------------------------//
 		
-				// ---------------------- For Loop Closure -------------------//
+				// ---------------------------- For Loop Closure ---------------------------//
 				loopDetect->detectLoop( scan ); // loop detect
 				
 				int loopId = loopDetect->detectedALoop();
+			
+				// if find a loop closure
 				if( loopId != -1 ){
 					cv::line( image, cv::Point2f( robotPoseCurr(0), robotPoseCurr(1) ),
                                                  cv::Point2f( keyPoses[loopId](0), keyPoses[loopId](1) ),
                                                  cv::Scalar( 0, 255, 0 ), 1 );
 
+					// filtering the wrong loop closure according to the distance
 					if( ( robotPosePrev - keyPoses[loopId] ).head<2>().norm() > 2.0f ){
 						std::cout<<"loop closure is too large ..."<<std::endl;
 						continue;
 					}
+
 					std::cout<<"-------------------------- Find A Loop Closure --------------------------"<<std::endl;
 					std::cout<<"Pose Current: "<<std::endl<<robotPoseCurr<<std::endl;
 					std::cout<<"Pose Loop: "<<std::endl<<keyPoses[loopId]<<std::endl;
@@ -167,19 +175,24 @@ int main()
                 	                Eigen::Matrix<float, 3, 3> T = T1.inverse() * T2;
                         	        Eigen::Vector3f V = slam.t2v( T );
 
-                                	optimizer.addEdge( V, keyFrameCount, loopId, information );
+                                	optimizer.addEdge( V, keyFrameCount, loopId, information ); // add a loop constraint
 	                                std::cout<<"Add A Loop Correlation ..."<<std::endl;
 					std::cout<<"----------- execuate the graph optimization ----------"<<std::endl;
 
-	                                optimizer.execuateGraphOptimization();
+	                                optimizer.execuateGraphOptimization(); // execuate the graph optimization
 
-        	                        optimizer.getOptimizedResults();
+        	                        optimizer.getOptimizedResults(); // get the optimized results
 
                 	                std::vector<Eigen::Vector3f> estimatedPoses = optimizer.getEstimatedPoses();
                         	        std::cout<<"keyPoses.size  = "<<keyPoses.size()<<std::endl;
                                 	std::cout<<"estimatedPoses.size = "<<estimatedPoses.size()<<std::endl;
-                                	// TODO ... process the estimated results
 
+                                	// TODO ... process the estimated results
+					// ---------------- ReConstruct the Occupied grid Map ---------------//
+					slam.reconstructMap( keyPoses, keyScanContainers );
+					slam.displayMap( image, keyPoses );
+					// ------------------------------- END ------------------------------//
+					
                                 	break;
 				}
 				// ---------------------- END ----------------------//

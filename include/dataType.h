@@ -52,6 +52,23 @@ struct LidarScan{
 		return *this;
 	}
 
+	void setParameters( const float angle_min, 
+			    const float angle_max, 
+			    const float angle_increment,
+			    const range_min,
+			    const range_max, 
+			    const scan_time = 0,
+			    const time_increment = 0 )
+	{
+		this->angle_min = angle_min;
+		this->angle_max = angle_max;
+		this->angle_increment = angle_increment;
+		this->range_min = range_min;
+		this->range_max = range_max;
+		this->scan_time = scan_time;
+		this->time_increment = time_increment;
+	}
+
 	const int size()
 	{
 		return Size;
