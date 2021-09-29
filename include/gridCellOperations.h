@@ -11,7 +11,7 @@ public:
 	GridCellOperations();
 	~GridCellOperations();
 
-	float getCellProbability( const GridCell &cell ) const;
+	const float getCellProbability( const GridCell &cell ) const;
 	
 	void setLogOddsPocc( float Pocc );
 	void setLogOddsPfree( float Pfree );
@@ -24,7 +24,7 @@ public:
 	void setCellUnFree( GridCell &cell ) const;
 	
 private:
-	float probability2LogOdds( float prob );
+	const float probability2LogOdds( float prob );
 
 private:
 	float logOddsPocc;

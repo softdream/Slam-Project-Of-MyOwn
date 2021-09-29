@@ -293,6 +293,18 @@ void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std:
 
 }
 
+void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std::vector<slam::ScanContainer> &scanContainers )
+{
+	std::cerr<<"-------------- ReConstruct the Map According to the estimated Key Poses ---------------"<<std::endl;
+	
+	occupiedGridMap->resetGridMap();
+	
+	for( size_t i = 0; i < keyPoses.size(); i ++ ){
+		// reconstruct the map  
+	        occupiedGridMap->updateByScan( scanContainers[i], keyPoses[i] );
+	}
+}
+
 const Eigen::Matrix<float, 3, 3> SlamProcessor::v2t(const Eigen::Vector3f &v)
 {
 	float c = ::cos( v(2) );

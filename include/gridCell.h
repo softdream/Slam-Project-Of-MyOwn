@@ -12,7 +12,7 @@ public:
 	
 	void setLogOddsValue( float logOddsValue );
 
-	float getLogOddsValue() const;
+	const float getLogOddsValue() const;
 
 	bool isOccupied() const ;
 	bool isFree() const;

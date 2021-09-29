@@ -33,8 +33,8 @@ public:
 
 	~OccupiedGridMap();
 
-	Eigen::Vector2f observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld ) const;
-	Eigen::Vector2f observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld ) const;
+	const Eigen::Vector2f observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld ) const;
+	const Eigen::Vector2f observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld ) const;
 
 	void inverseModel( int x0, int y0, int x1, int y1 );
 	void inverseModel( Eigen::Vector2i &p0, Eigen::Vector2i &p1 );
@@ -255,7 +255,7 @@ void OccupiedGridMap<MapBaseType>::bresenhamCellOccupied( int mapX, int mapY )
 }
 
 template<typename MapBaseType>
-Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld ) const
+const Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseLaser2World( Eigen::Vector2f &poseInLaser, Eigen::Vector3f &robotPoseInWorld ) const
 {
 	//Eigen::Vector2f poseInWorld_temp( ( ::cos( robotPoseInWorld[2] ) * poseInLaser[0] - ::sin( robotPoseInWorld[2] ) * poseInLaser[1] ), ( ::sin( robotPoseInWorld[2] ) * poseInLaser[0] + ::cos( robotPoseInWorld[2] ) * poseInLaser[1] ) );
 
@@ -269,7 +269,7 @@ Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseLaser2World( Eige
 }
 
 template<typename MapBaseType>
-Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld ) const
+const Eigen::Vector2f OccupiedGridMap<MapBaseType>::observedPointPoseWorld2Laser( Eigen::Vector2f &poseInWorld, Eigen::Vector3f &robotPoseInWorld ) const
 {
 	Eigen::Matrix2f rotateMat;
         rotateMat << ::cos( robotPoseInWorld[2] ), -(::sin( robotPoseInWorld[2] )),
@@ -286,21 +286,33 @@ void OccupiedGridMap<MapBaseType>::updateByScan_test( ScanContainer &points, Eig
 	
 	// 1. Transform robot Pose In world Coordinate to Map Coordinate
 	Eigen::Vector3f robotPoseInMap = this->robotPoseWorld2Map( robotPoseInWorld );
+
+#ifdef TERMINAL_LOG
 	std::cout<<"Robot Pose In Map Coordinate: "<<std::endl;
 	std::cout<<robotPoseInMap<<std::endl;
+#endif
 
 	// 2. Get the start point of the laser data in Map Coordinate
 	Eigen::Vector2i scanBeginMapI( robotPoseInMap.head<2>().cast<int>() );
+
+#ifdef TERMINAL_LOG
 	std::cout<<"Robot Pose In Map Coordinate(Interger): "<<std::endl;
 	std::cout<<scanBeginMapI<<std::endl;
+#endif
 
 	size_t numberOfBeams = points.getSize();
+
+#ifdef TERMINAL_LOG
 	std::cout<<"Number Of Beams: "<<numberOfBeams<<std::endl;
-	
+#endif	
+
 	for( size_t i = 0; i < numberOfBeams; i ++ ){
 		// 3. Get the End point of Every Laser Beam in Laser Coordinate
 		Eigen::Vector2f scanEndInLaser( points.getIndexData( i ) );
+
+#ifdef TERMINAL_LOG
 		std::cout<<"Occupied Point In World ( "<<scanEndInLaser[0]<<", "<<scanEndInLaser[1]<<" )"<<std::endl;		
+#endif
 
 		// 4. Transform the End Point from Laser Coordinate to World Coordinate
 		Eigen::Vector2f scanEndInWorld( this->observedPointPoseLaser2World( scanEndInLaser, robotPoseInWorld ) );

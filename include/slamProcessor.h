@@ -56,6 +56,9 @@ public:
 	void reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, 
 			     std::vector<slam::sensor::LaserScan> &keyScans );
 
+	void reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, 
+			     std::vector<slam::ScanContainer> &scanContainers );
+
 private:
 	bool poseDiffLargerThan( Eigen::Vector3f &poseOld, Eigen::Vector3f &poseNew );
 

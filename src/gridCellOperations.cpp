@@ -21,14 +21,14 @@ GridCellOperations::~GridCellOperations()
 
 }
 
-float GridCellOperations::probability2LogOdds( float prob )
+const float GridCellOperations::probability2LogOdds( float prob )
 {
 	float odds = prob / ( 1.0f - prob );
 	
 	return ::log( odds );
 }
 
-float GridCellOperations::getCellProbability( const GridCell &cell ) const
+const float GridCellOperations::getCellProbability( const GridCell &cell ) const
 {
 	float odds = ::exp( cell.logOddsValue );
 	

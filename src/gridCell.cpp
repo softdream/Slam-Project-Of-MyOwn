@@ -23,7 +23,7 @@ void GridCell::setLogOddsValue( float logOddsValue )
 	this->logOddsValue = logOddsValue;
 }
 
-float GridCell::getLogOddsValue() const
+const float GridCell::getLogOddsValue() const
 {
 	return logOddsValue;
 }

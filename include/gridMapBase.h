@@ -30,13 +30,13 @@ public:
 	void setMapInfo( int sizeX, int sizeY, int cellLength );	
 	void setMapInfo( const MapInfo &newMapInfo );
 
-	MapInfo getMapInfo() const;
-        int getSizeX() const;
-        int getSizeY() const;
+	const MapInfo getMapInfo() const;
+        const int getSizeX() const;
+        const int getSizeY() const;
 
-	Eigen::Vector2i getMapCenter() const;
-        float getCellLength() const;
-        float getScale() const;	
+	const Eigen::Vector2i getMapCenter() const;
+        const float getCellLength() const;
+        const float getScale() const;	
 
 	CellType &getCell( int x, int y ) ;
 	const CellType &getCell( int x, int y ) const;
@@ -44,18 +44,18 @@ public:
 	CellType &getCell( int index );
 	const CellType &getCell( int index ) const;
 
-	Eigen::Vector2f observedPointPoseWorld2Map( Eigen::Vector2f &poseInWorld ) const;
-	Eigen::Vector2f observedPointPoseMap2World( Eigen::Vector2f &poseInMap ) const;
+	const Eigen::Vector2f observedPointPoseWorld2Map( Eigen::Vector2f &poseInWorld ) const;
+	const Eigen::Vector2f observedPointPoseMap2World( Eigen::Vector2f &poseInMap ) const;
 	
-	Eigen::Vector3f robotPoseWorld2Map( Eigen::Vector3f &poseInWorld ) const;
-	Eigen::Vector3f robotPoseMap2World( Eigen::Vector3f &poseInMap ) const;
+	const Eigen::Vector3f robotPoseWorld2Map( Eigen::Vector3f &poseInWorld ) const;
+	const Eigen::Vector3f robotPoseMap2World( Eigen::Vector3f &poseInMap ) const;
 
 	bool isPointOutOfRange( float x, float y ) const;
 	bool isPointOutOfRange( const Eigen::Vector2f point ) const;
 
 	void printMapInfo() const;	
 
-	size_t getCellsNumber() const;
+	const size_t getCellsNumber() const;
 
 	void setCellOccupied( int index );
 	void setCellOccupied( int mapX, int mapY );
@@ -65,8 +65,8 @@ public:
 	void setCellUnFree( int index );
 	void setCellUnFree( int mapX, int mapY );
 
-	float getCellOccupiedProbability( int index ) const;
-	float getCellOccupiedProbability( int mapX, int mapY ) const;
+	const float getCellOccupiedProbability( int index ) const;
+	const float getCellOccupiedProbability( int mapX, int mapY ) const;
 
 	void setLogOddsPoccValue( float Pocc );
 	void setLogOddsPfreeValue( float Pfree );
@@ -79,7 +79,7 @@ public:
 	bool isCellFree( int index );
 	bool isCellFree( int mapX, int mapY );
 
-	float getCellLogOdds(int mapX, int mapY);	
+	const float getCellLogOdds(int mapX, int mapY);	
 
 	const std::vector<CellType> getMapArray() const;
 	
@@ -163,37 +163,37 @@ void GridMapBase<CellType, CellOperations>::setMapInfo( const MapInfo &newMapInf
 }
 
 template<typename CellType, typename CellOperations>
-MapInfo GridMapBase<CellType, CellOperations>::getMapInfo() const
+const MapInfo GridMapBase<CellType, CellOperations>::getMapInfo() const
 {
 	return mapInfo.getMapInfo();
 }
 
 template<typename CellType, typename CellOperations>
-int GridMapBase<CellType, CellOperations>::getSizeX() const
+const int GridMapBase<CellType, CellOperations>::getSizeX() const
 {
 	return mapInfo.getSizeX();
 }
 
 template<typename CellType, typename CellOperations>
-int GridMapBase<CellType, CellOperations>::getSizeY() const
+const int GridMapBase<CellType, CellOperations>::getSizeY() const
 {
 	return mapInfo.getSizeY();
 }
 
 template<typename CellType, typename CellOperations>
-Eigen::Vector2i GridMapBase<CellType, CellOperations>::getMapCenter() const
+const Eigen::Vector2i GridMapBase<CellType, CellOperations>::getMapCenter() const
 {
 	return mapInfo.getMapCenter();
 }
 
 template<typename CellType, typename CellOperations>
-float GridMapBase<CellType, CellOperations>::getCellLength() const
+const float GridMapBase<CellType, CellOperations>::getCellLength() const
 {
 	return mapInfo.getCellLength();
 }
 
 template<typename CellType, typename CellOperations>
-float GridMapBase<CellType, CellOperations>::getScale() const
+const float GridMapBase<CellType, CellOperations>::getScale() const
 {
 	return mapInfo.getScale();
 }
@@ -261,7 +261,7 @@ const CellType& GridMapBase<CellType, CellOperations>::getCell( int index ) cons
 
 
 template<typename CellType, typename CellOperations>
-Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseWorld2Map( Eigen::Vector2f &poseInWorld ) const
+const Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseWorld2Map( Eigen::Vector2f &poseInWorld ) const
 {
 	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );
 
@@ -269,7 +269,7 @@ Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseWorld2Ma
 }
 
 template<typename CellType, typename CellOperations>
-Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseMap2World( Eigen::Vector2f &poseInMap ) const
+const Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseMap2World( Eigen::Vector2f &poseInMap ) const
 {
 	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );
 
@@ -277,7 +277,7 @@ Eigen::Vector2f GridMapBase<CellType, CellOperations>::observedPointPoseMap2Worl
 }
 
 template<typename CellType, typename CellOperations>
-Eigen::Vector3f GridMapBase<CellType, CellOperations>::robotPoseWorld2Map( Eigen::Vector3f &poseInWorld ) const
+const Eigen::Vector3f GridMapBase<CellType, CellOperations>::robotPoseWorld2Map( Eigen::Vector3f &poseInWorld ) const
 {
 	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );	
 
@@ -287,7 +287,7 @@ Eigen::Vector3f GridMapBase<CellType, CellOperations>::robotPoseWorld2Map( Eigen
 }
 
 template<typename CellType, typename CellOperations>
-Eigen::Vector3f GridMapBase<CellType, CellOperations>::robotPoseMap2World( Eigen::Vector3f &poseInMap ) const
+const Eigen::Vector3f GridMapBase<CellType, CellOperations>::robotPoseMap2World( Eigen::Vector3f &poseInMap ) const
 {
 	Eigen::Vector2f temp( static_cast<float>( this->getMapCenter()[0] ), static_cast<float>( this->getMapCenter()[1] )  );	
 
@@ -322,7 +322,7 @@ void GridMapBase<CellType, CellOperations>::printMapInfo() const
 }
 
 template<typename CellType, typename CellOperations>
-size_t GridMapBase<CellType, CellOperations>::getCellsNumber() const
+const size_t GridMapBase<CellType, CellOperations>::getCellsNumber() const
 {
 	return mapArray.size();
 }
@@ -374,13 +374,13 @@ void GridMapBase<CellType, CellOperations>::setCellUnFree( int mapX, int mapY )
 
 
 template<typename CellType, typename CellOperations>
-float GridMapBase<CellType, CellOperations>::getCellOccupiedProbability( int index ) const
+const float GridMapBase<CellType, CellOperations>::getCellOccupiedProbability( int index ) const
 {
 	return cellOperate.getCellProbability( this->getCell( index ) );
 }
 
 template<typename CellType, typename CellOperations>
-float GridMapBase<CellType, CellOperations>::getCellOccupiedProbability( int mapX, int mapY ) const
+const float GridMapBase<CellType, CellOperations>::getCellOccupiedProbability( int mapX, int mapY ) const
 {
 	return cellOperate.getCellProbability( this->getCell( mapX, mapY ) );
 }
@@ -434,7 +434,7 @@ bool GridMapBase<CellType, CellOperations>::isCellFree( int mapX, int mapY )
 }
 
 template<typename CellType, typename CellOperations>
-float GridMapBase<CellType, CellOperations>::getCellLogOdds( int mapX, int mapY )
+const float GridMapBase<CellType, CellOperations>::getCellLogOdds( int mapX, int mapY )
 {
 	return (this->getCell( mapX, mapY ).logOddsValue);
 }
