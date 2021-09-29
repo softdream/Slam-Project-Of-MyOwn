@@ -191,6 +191,7 @@ int main()
 					// ---------------- ReConstruct the Occupied grid Map ---------------//
 					slam.reconstructMap( keyPoses, keyScanContainers );
 					slam.displayMap( image, keyPoses );
+					cv::waitKey(0);
 					// ------------------------------- END ------------------------------//
 					
                                 	break;

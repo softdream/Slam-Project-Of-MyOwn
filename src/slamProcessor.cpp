@@ -299,6 +299,8 @@ void SlamProcessor::reconstructMap( std::vector<Eigen::Vector3f> &keyPoses, std:
 	
 	occupiedGridMap->resetGridMap();
 	
+	occupiedGridMap->updateByScan( scanContainers[0], keyPoses[0] );
+
 	for( size_t i = 0; i < keyPoses.size(); i ++ ){
 		// reconstruct the map  
 	        occupiedGridMap->updateByScan( scanContainers[i], keyPoses[i] );
@@ -362,7 +364,7 @@ void SlamProcessor::displayMap( cv::Mat &image, const std::vector<Eigen::Vector3
 	for( auto it : poses ){
         	Eigen::Vector3f poseVec = occupiedGridMap->robotPoseWorld2Map( it );
 	        cv::Point2d pose( poseVec(0), poseVec(1) );
-        	cv::circle( image, pose, 3, cv::Scalar(0, 255, 0), -1 );
+        	cv::circle( image, pose, 2, cv::Scalar(0, 255, 0), -1 );
 	}
         std::cout<<"---------------- Result --------------------"<<std::endl;
         std::cout<<"Occupied Points Number: "<<occupiedCount<<std::endl;

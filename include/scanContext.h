@@ -326,6 +326,7 @@ const Eigen::MatrixXf ScanContext<T, Dimension>::makeScanContext( const slam::se
 
 	//std::cout<<"desc : "<<std::endl<<desc<<std::endl;
 	
+	// weighted occupied probability, need to be optimized
 	for( int i = 0; i < desc.rows(); i ++ ){
 		for( int j = 0; j < desc.cols(); j ++ ){
 			float index = desc(i, j);
@@ -355,9 +356,12 @@ const Eigen::MatrixXf ScanContext<T, Dimension>::makeRingkeyFromScancontext( con
         	Eigen::MatrixXf curr_row = desc.row(row_idx);
         	invariant_key(row_idx, 0) = curr_row.mean();
     	}
+
+#ifdef TERMINAL_LOG
 	std::cout<< " ------------ Ring Key Vector ------------- "<<std::endl;
 	std::cout<< invariant_key<<std::endl;
-	
+#endif	
+
     	return invariant_key;
 }
 
@@ -505,16 +509,19 @@ const std::pair<int, float> ScanContext<T, Dimension>::detectLoopClosureID()
 
 	// 2. kd tree construction
 	if( tree_making_period_conter % TREE_MAKING_PERIOD == 0 ){
-		std::cout<<"here ================================================"<<std::endl;
+		std::cout<<" ========================= ReConstruct the KD Tree  ======================"<<std::endl;
 		ringKeysMat.clear(); // samples 
 		ringKeysMat.assign( ringKeys.begin(), ringKeys.end() - NUM_EXCLUDE_RECENT );
 		
 		kdTree.reset();
 		kdTree = std::make_unique<myKDTree>( Dimension, ringKeysMat, 10 );
-		std::cout<<"-------------- Reconstruct the kd tree ............... "<<std::endl;
+		std::cout<<" ========================= Reconstruct the kd tree ======================"<<std::endl;
 	}
 	tree_making_period_conter += 1;
+
+#ifdef TERMINAL_LOG
 	std::cout<<"Tree Making Period Counter : "<<tree_making_period_conter<<std::endl;	
+#endif
 
 	float min_dist = 10000000; // init with somthing large
     	int nn_align = 0;
@@ -554,8 +561,9 @@ const std::pair<int, float> ScanContext<T, Dimension>::detectLoopClosureID()
 		std::cerr<<"---------------------------------------------------------------------------"<<std::endl;		
 
         	// std::cout.precision(3); 
-        	std::cout << "[Loop found] Nearest distance: " << min_dist << " btn " << scanContexts.size()-1 << " and " << nn_idx << "." << std::endl;
+        	std::cout << "[Loop found] Nearest distance: " << min_dist << " between " << scanContexts.size()-1 << " and " << nn_idx << "." << std::endl;
         	std::cout << "[Loop found] yaw diff: " << nn_align * UNIT_SECTOR_ANGLE << " deg." << std::endl;
+		std::cout << "--------------------------------- END ----------------------------------"<<std::endl;
     	}
  /*   	else{
         	std::cout.precision(3); 
