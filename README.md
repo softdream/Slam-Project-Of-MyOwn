@@ -139,7 +139,8 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>一帧激光扫描数据如下所示:<br>
   ![A frame of Scan](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/lidar_scan.png)<br>
   >>将激光扫描帧转化为Scan Context效果如下：
-   ![A frame of Scan Context](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/scan_context.png)<br>
+   ![A frame of Scan Context Raw](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/scanContextRaw.png)<br>
+   ![A frame of Scan Context Desc](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/scanContextDesc.png)<br>
   >>使用Scan Context进行回环检测的思路是将所有激光扫描帧转化为Scan Context, 然后提取出每一个Scan Context的特征，称之为Ring Key并将其加入到KD树(K-Dimension Tree)中，当新的扫描帧加入时使用近似最邻近查找(Approximate Nearest Neighbor Search)算法查找出余弦距离最近的扫描帧，如果距离小于阈值则判断检测到了回环，再使用一步ICP算法求出两个回环帧间的坐标变换关系。<br>
   >>回环检测的结果如下：<br>
   ![loop closure detect](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/loop_closure_detect.png)<br>
