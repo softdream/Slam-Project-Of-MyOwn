@@ -76,8 +76,6 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
 ```shell
 ./slamSimulation
 ```
-运行结果如下：
-![image map_test](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/map.png)<br>
 
 
 ## 3. 代码内容简介
