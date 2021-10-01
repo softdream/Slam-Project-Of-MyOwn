@@ -85,7 +85,7 @@ const OccupiedMap& LoadMap::getMap()
 const OccupiedMap& LoadMap::operator()( const std::string &fileName )
 {
 	// 1. open the occupied grid map file
-	assert( !openMapFile( fileName ) );
+	assert( openMapFile( fileName ) );
 
 	// 2. read the occupied grid map file
 	loadMap();

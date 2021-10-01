@@ -10,15 +10,7 @@ Localization::Localization()
 
 Localization::~Localization()
 {
-	if( occupiedGridMap != nullptr ){
-                delete occupiedGridMap;
-        }
 
-        if( scanMatch != nullptr ){
-                delete scanMatch;
-        }
-	
-	std::cerr<<"delete the occupied grid map memory ... "<<std::endl;
 }
 
 void Localization::setInitialPose(const Eigen::Vector3f &pose)
@@ -38,8 +30,9 @@ bool Localization::update( const ScanContainer &scanContainer, bool mapWithoutMa
 	Eigen::Vector3f newPoseEstimated;// estimated pose in world coordinate
 
         if( !mapWithoutMatching ){ 
+		std::cout<<" scan matching ..."<<std::endl;
 		// 2. scan Match
-                newPoseEstimated = scanMatch->scanToMap( *occupiedGridMap,  // map
+                newPoseEstimated = scanMatch->scanToMap( occupiedGridMap,  // map
 							 lastScanMatchPose, // robot pose in world coordination
 							 scanContainer,     // scan data
 							 covarianceMatrix,  // covariance matrix
@@ -65,6 +58,9 @@ const Eigen::Matrix3f Localization::getCovarianceMatrix() const
 	return covarianceMatrix;
 }
 
-
+void Localization::setOccupiedMap( const OccupiedMap &occupiedMapPtr )
+{
+	occupiedGridMap = occupiedMapPtr;
+}
 
 }

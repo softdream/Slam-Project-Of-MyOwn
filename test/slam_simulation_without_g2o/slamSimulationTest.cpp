@@ -4,6 +4,8 @@
 
 #include "odomSimulation.h"
 
+#include "saveMap.h"
+
 void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
 {
         size_t size = 1440;
@@ -36,6 +38,7 @@ int main()
 	slam::MapInfo mapInfo = slam.getMapInfo();
 	
 	slam::simulation::OdomSimulation ouputOdom;	
+
 
 	// print the map information
 	std::cout<<"------------- Map Information ----------------"<<std::endl;
@@ -108,7 +111,7 @@ int main()
 			std::cout<<"------------------"<<std::endl;
 	
 			// record
-			ouputOdom.writeAFrameData( robotPosePrev );
+			//ouputOdom.writeAFrameData( robotPosePrev );
 		
 			if( slam.isKeyFrame() ){
 				// added for recording the laser odometry data
@@ -124,7 +127,10 @@ int main()
 		cv::waitKey(5);	
 		count ++;
 	}
-		
+	
+	// finally, save the occupied grid map
+	slam::SaveMap()( "./test.map", slam.getOccupiedMap() );
+	
 
 	// close the simulation file
 	simulation.closeSimulationFile();

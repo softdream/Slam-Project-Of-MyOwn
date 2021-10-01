@@ -72,6 +72,9 @@ public:
 	// ----- Added for caculating the transformation between two poses ----- //
 	const Eigen::Vector3f getContraintBetweenTwoPoints( const Eigen::Vector3f &pose1, const Eigen::Vector3f &pose2 );
 	
+	// ------ Added for getting the occupied map data -------//
+	const OccupiedMap getOccupiedMap() const;
+
 private:
 
 	// - Grid Map Object & Scan Match Object -//

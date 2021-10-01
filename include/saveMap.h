@@ -17,7 +17,6 @@ public:
 	// Functor
 	bool operator()( const std::string &fileName, const OccupiedMap &map );
 
-private:
 	bool openMapFile( const std::string &fileName );
 	void closeMapFile();
 	

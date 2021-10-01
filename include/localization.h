@@ -20,12 +20,12 @@ public:
 
 	const Eigen::Matrix3f getCovarianceMatrix() const;
 	
-	void setOccupiedMap( const OccupiedMap *occupiedMapPtr );
+	void setOccupiedMap( const OccupiedMap &occupiedMapPtr );
 
 	void setScanMatch( const ScanMatchMethod *scanMatchPtr );
 
 private:
-	OccupiedMap *occupiedGridMap;
+	OccupiedMap occupiedGridMap;
         ScanMatchMethod *scanMatch;
 
 	// some important varibles 

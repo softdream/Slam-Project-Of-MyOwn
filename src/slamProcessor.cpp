@@ -387,6 +387,10 @@ const Eigen::Vector3f SlamProcessor::getContraintBetweenTwoPoints( const Eigen::
 	return V;
 }
 
+const OccupiedMap SlamProcessor::getOccupiedMap() const
+{
+	return *occupiedGridMap;
+}
 
 } // end of namespace slam
 
