@@ -1,6 +1,8 @@
 #include "scanMatch.h"
 #include "utils.h"
 
+//#define TERMINAL_LOG
+
 namespace slam {
 
 ScanMatchMethod::ScanMatchMethod() : mP00( 0 ), 
@@ -180,6 +182,10 @@ void ScanMatchMethod::getHessianDerivative( const OccupiedMap &occuMap,
 	
 	H = Eigen::Matrix3f::Zero();
 	dTr = Eigen::Vector3f::Zero();	
+	
+#ifdef TERMINAL_LOG
+	std::cout<<"size = "<<size<<std::endl;
+#endif
 
 	for( int i = 0; i < size; i ++ ){
 		// 1. get the current point in laser coordinate

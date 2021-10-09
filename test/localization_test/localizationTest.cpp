@@ -5,6 +5,8 @@
 
 #include "localization.h"
 
+#include "slamProcessor.h"
+
 
 void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
 {
@@ -52,6 +54,14 @@ void displayMap( slam::OccupiedMap &occupiedGridMap, cv::Mat &image )
         std::cout<<"Occupied Points Number: "<<occupiedCount<<std::endl;
 }
 
+/*void dispalyScans( slam::OccupiedMap &occupiedGridMap, slam::ScanContainer &container, cv::Mat &image )
+{
+	for( size_t i = 0; i < container.size(); i ++ ){
+		Eigen::Vector2f pointInWorld;
+		occupiedGridMap.observedPointPoseWorld2Map(  );
+	}
+}*/
+
 
 int main()
 {
@@ -64,9 +74,10 @@ int main()
 
 	// 2. read the Occupied Map from the file
 	occupiedMap = slam::LoadMap()( "../../../simulation_file/test.map" );
+	occupiedMap.setMapInfo( 1001,  1001, 10);
 
 	// open the simulation file
-        std::string file_name = "../../../simulation_file/laser_data.txt";
+        std::string file_name = "../../../simulation_file/laser_data2.txt";
         simulation.openSimulationFile( file_name );
 
 	
@@ -83,15 +94,13 @@ int main()
 	// display the map
 	displayMap( occupiedMap, image );
 	cv::imshow( "map", image );
+	cv::waitKey(0);
 
-	// 4. localization instance
-	slam::Localization localize;
+	slam::SlamProcessor slam;
 
  	// robot pose
-        Eigen::Vector3f robotPose( 0.0f, 0.0f, 0.0f );
+        Eigen::Vector3f robotPose( 0.001f, 0.01f, 0.001f );
 	
-	//localize.setInitialPose( robotPose );
-	localize.setOccupiedMap( occupiedMap );
 
 	while( !simulation.endOfFile() ){
                 // 1. get the laser data
@@ -101,17 +110,17 @@ int main()
                 simulation.readAFrameData( scan ); // read the laser data
 
                 laserData2Container( scan, scanContainer );// convert the laser data to scanContainer type
-
+		scanContainer.displayAFrameScan();
+	
 		std::cout<<"frame count: "<<simulation.getFrameCount()<<std::endl;
 
-		localize.setInitialPose( robotPose );
-		localize.update( scanContainer );
-
-	//	robotPose = localize.getLastScanMatchPose();
-	//	std::cout<<"pose now: "<<std::endl<<robotPose<<std::endl<<std::endl;
-
-		cv::waitKey(60);	
+		slam.update( robotPose, scanContainer );
+		robotPose = slam.getLastScanMatchPose();
+                std::cout<<"robot pose now: "<<std::endl;
+                std::cout<<robotPose<<std::endl;
+                std::cout<<"------------------"<<std::endl;
 		
+		cv::waitKey(60);
 	}
 	
 	simulation.closeSimulationFile();

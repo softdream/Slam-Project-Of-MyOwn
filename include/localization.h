@@ -15,6 +15,11 @@ public:
 	void setInitialPose(const Eigen::Vector3f &pose);
 	
 	bool update( const ScanContainer &scanContainer, bool mapWithoutMatching = false );
+	
+	bool update( const OccupiedMap &occupiedMap, 
+		     Eigen::Vector3f &pose, 
+		     const ScanContainer &scanContainer, 
+		     bool mapWithoutMatching = false );
 
 	const Eigen::Vector3f getLastScanMatchPose() const;
 
@@ -26,7 +31,7 @@ public:
 
 private:
 	OccupiedMap occupiedGridMap;
-        ScanMatchMethod *scanMatch;
+        ScanMatchMethod scanMatch;
 
 	// some important varibles 
 	Eigen::Vector3f lastScanMatchPose;

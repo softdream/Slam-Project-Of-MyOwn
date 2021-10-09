@@ -12,14 +12,16 @@ void displayMap( slam::OccupiedMap &occupiedGridMap, cv::Mat &image )
                 for( int j = 0; j < occupiedGridMap.getSizeY(); j ++ ){
                         if( occupiedGridMap.isCellFree( i, j ) ){
                                 cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(255, 255, 255), -1);
-
+				
                         }
                         else if( occupiedGridMap.isCellOccupied( i, j ) ){
                                 occupiedCount ++;
                                 cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), -1);
-                        }
-
-                }
+                        
+		
+				std::cout<<"cell( "<<i<<", "<<j <<" ): "<<occupiedGridMap.getCellLogOdds(i, j)<<std::endl;
+                	}
+		}
         }
  
         std::cout<<"---------------- Result --------------------"<<std::endl;
@@ -37,11 +39,13 @@ int main()
 	// 2. read the Occupied Map from the file
 	occupiedMap = slam::LoadMap()( "../../../simulation_file/test.map" );
 
+	occupiedMap.setMapInfo( 1001,  1001, 10);
 	// 3. print the information of the map
 	std::cout<<"-------------------- Map Information -----------------"<<std::endl;
-	std::cout<<"map sizeX : "<<occupiedMap.getSizeX()<<std::endl;	
-	std::cout<<"map sizeY : "<<occupiedMap.getSizeY()<<std::endl;
+	std::cout<<"map sizeX       : "<<occupiedMap.getSizeX()<<std::endl;	
+	std::cout<<"map sizeY       : "<<occupiedMap.getSizeY()<<std::endl;
 	std::cout<<"map cell length : "<<occupiedMap.getCellLength()<<std::endl;
+	std::cout<<"map scale       : "<<occupiedMap.getScale()<<std::endl;
 	std::cout<<"------------------------- END -----------------------"<<std::endl;
 	
 	// init the image
