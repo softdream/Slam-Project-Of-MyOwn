@@ -75,6 +75,9 @@ public:
 	// ------ Added for getting the occupied map data -------//
 	const OccupiedMap getOccupiedMap() const;
 
+	// --------------- Added for save the map ---------------//
+	void saveMapAsBMP( const std::string &fileName );
+	
 private:
 
 	// - Grid Map Object & Scan Match Object -//

@@ -392,6 +392,30 @@ const OccupiedMap SlamProcessor::getOccupiedMap() const
 	return *occupiedGridMap;
 }
 
+void SlamProcessor::saveMapAsBMP( const std::string &fileName )
+{
+	cv::Mat image = cv::Mat(occupiedGridMap->getSizeX(), occupiedGridMap->getSizeY(), CV_8UC1, cv::Scalar::all(125));
+
+
+        for( int i = 0; i < occupiedGridMap->getSizeX(); i ++ ){
+                for( int j = 0; j < occupiedGridMap->getSizeY(); j ++ ){
+                        if( occupiedGridMap->isCellFree( i, j ) ){ // free for 255, white    
+                                image.at<uchar>(i, j) = 255;
+                        }
+                        else if( occupiedGridMap->isCellOccupied( i, j ) ){
+                                image.at<uchar>(i, j) = 0; // occupied for 0, black
+                        }
+                }
+        }
+
+        cv::imshow( "bmp map", image );
+
+        cv::imwrite( fileName, image );
+	std::cout<<"Save the Map to The BMP file ..."<<std::endl;
+}
+
+
+
 } // end of namespace slam
 
 
