@@ -119,8 +119,8 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
   >>4. CSM + 分支限界法：<br>相关性扫描匹配(Correlation Scan Matching, CSM)方法即暴力匹配方法，在一个搜索窗口对所有激光点数据进行暴力匹配，为降低匹配时间，采用分支限界法对搜索窗口进行剪枝，减少匹配次数。谷歌开源的cartographer即采用此种方法来做回环检测。<br>
   >>5. NDT方法：正态分布变换(Normal Distribution Transformation)。<br>
   
-  >>本项目采用Scan To Map的方法。参考了开源项目hector slam。
-  
+  >>本项目采用Scan To Map的方法。参考了开源项目hector slam。由于Scan to Map的方法是基于最小二乘的优化算法，使用牛顿高斯法求解最优匹配结果时有时候会陷入局部最优值，为了解决这个问题，Hector Slam中使用了多重分辨率地图(类似于图像金字塔)，现在低分辨率地图中进行粗匹配，再在高分辨率地图中进行精匹配。本项目采用里程计的估计位姿来为
+  求解方程提供一个优秀的初值来解决这个问题。
 ### 3.3 SLAM后端
 #### 3.3.1 回环检测方法(已解决)
   >>回环检测(Loop Closure Detection)是用来检测机器人有没有在某一时刻运动到之前到过的点，如果是则构成一个回环，一个回环是一个强约束，通常与图优化方法相结合，用来对回环上的所有位姿估计进行优化，消除累计误差。<br>
