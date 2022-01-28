@@ -154,7 +154,7 @@ gridMapBaseTest  icpTest  scanMatchTest  slamSimulation
 ### 最终结果
   >> 最终效果如下图所示：<br>
   ![Result Map](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/map.png)<br>
-  >> 其中绿色的点为估计出的机器人位姿轨迹。<br>
+  >> 其中绿色的点为估计出的机器人位姿轨迹。构建的环境地图如下所示：<br>
   ![Result Map](https://github.com/softdream/Slam-Project-Of-MyOwn/blob/master/doc/test.bmp)<br>
  
 
