@@ -161,8 +161,6 @@ void EKF::setNoiseQ( const float q1, const float q2, const float q3,
 	this->Q(5, 5) = q6;
 }
 	
-	
-	
 }
 
 

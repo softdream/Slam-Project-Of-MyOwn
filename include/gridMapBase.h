@@ -211,8 +211,7 @@ void GridMapBase<CellType, CellOperations>::allocateMapArray()
 		std::cerr<<"allocate the memory for the map failed ..."<<std::endl;
                 exit(-1);
 	}
-	std::cerr<<"allocate the memory for the map ..."<<std::endl;
-	
+	std::cout<<"allocate the memory for the map ..."<<std::endl;
 }
 
 template<typename CellType, typename CellOperations>

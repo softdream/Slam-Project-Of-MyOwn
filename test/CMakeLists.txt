@@ -20,4 +20,4 @@ ADD_SUBDIRECTORY( slam_simulation_with_g2o )
 
 #ADD_SUBDIRECTORY( load_map_test )
 
-ADD_SUBDIRECTORY( localization_test )
+#ADD_SUBDIRECTORY( localization_test )

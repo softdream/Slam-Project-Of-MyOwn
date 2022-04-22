@@ -15,15 +15,15 @@ LoadMap::~LoadMap()
 
 bool LoadMap::openMapFile( const std::string &fileName )
 {
+
 	infile.open( fileName, std::ios::binary );
-	
 	if( !infile.is_open() ){
 		std::cerr<<"Failed To Open The Map File ..."<<std::endl;
 		
 		return false;
 	}
 
-	std::cerr<<"Open The Map File ..."<<std::endl;
+	std::cout<<"Open The Map File ..."<<std::endl;
 
 	return true;
 }
@@ -72,9 +72,9 @@ void LoadMap::loadMap()
 	mapArray.resize( cellsNumber );
 	
 	infile.read( reinterpret_cast<char *>( mapArray.data() ), cellsNumber * sizeof( GridCell ) );
+	std::cout << "cellsNumber: " << cellsNumber << std::endl;
 
-	occupiedMap.setMapArray( mapArray );
-	
+	occupiedMap.setMapArray(mapArray);
 }
 
 const OccupiedMap& LoadMap::getMap()
@@ -85,7 +85,8 @@ const OccupiedMap& LoadMap::getMap()
 const OccupiedMap& LoadMap::operator()( const std::string &fileName )
 {
 	// 1. open the occupied grid map file
-	assert( openMapFile( fileName ) );
+	// assert( openMapFile( fileName ));
+	openMapFile(fileName);
 
 	// 2. read the occupied grid map file
 	loadMap();

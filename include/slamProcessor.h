@@ -77,7 +77,8 @@ public:
 
 	// --------------- Added for save the map ---------------//
 	void saveMapAsBMP( const std::string &fileName );
-	
+	bool saveMap( const std::string &fileName );	
+
 private:
 
 	// - Grid Map Object & Scan Match Object -//

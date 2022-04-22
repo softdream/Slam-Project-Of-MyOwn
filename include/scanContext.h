@@ -17,6 +17,13 @@
 
 namespace slam{
 
+struct yaw_dist_id
+{
+	float yaw;
+	float dist;
+	int pose_id;
+};
+
 // just for visulizing the scan context, not important
 static const unsigned char r[64] = { 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   10,  20,  30,  40,  50,  60,  70,  80,  90,  100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
 static const unsigned char g[64] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 240, 230, 220, 210, 200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100, 90,  80,  70,  60,  50,  40,  30,  20,  10,  0 };
@@ -46,7 +53,9 @@ public:
 	void makeAndSaveScancontextAndKeys( const slam::sensor::LaserScan &scan );
 	
 	const std::pair<int, float> detectLoopClosureID();
-	
+
+	void detectScancontextID( yaw_dist_id &yaw_dist_id_);
+
 	void displayAScancontext( const Eigen::MatrixXf &desc ) const;
 private:
 	template<typename TT>
@@ -71,25 +80,52 @@ private:
 	void drawABin(cv::Mat &image,  int ring_idx, const int sctor_idx);
 	
 public:
+	
 	// added 
 	const Eigen::MatrixXf& getScanContext( int index ) const;
 	const Eigen::MatrixXf& getRingKey( int index ) const; 
 	const int getScanContextsSize() const;
-	
-	void displayScanDistribution( const slam::sensor::LaserScan &scan );
 
+	const std::vector<Eigen::MatrixXf> getScanContexts() const
+	{
+		return scanContexts;
+	}
+
+	const std::vector<Eigen::MatrixXf> getRingKeys() const
+	{
+		return ringKeys;
+	}	
+
+	const std::vector<Eigen::MatrixXf> getSectorKeys() const
+	{
+		return sectorKeys;
+	}
+
+	void setScanContexts(const std::vector<Eigen::MatrixXf> scanContexts_)
+	{
+		scanContexts = scanContexts_;
+	}
+
+	void setRingKeys( const std::vector<Eigen::MatrixXf> &ringKeys_)
+	{
+		ringKeys = ringKeys_;
+	}
+	void setSectorKeys( const std::vector<Eigen::MatrixXf> &sectorKeys_)
+	{
+		sectorKeys = sectorKeys_;
+	}
+
+	void displayScanDistribution( const slam::sensor::LaserScan &scan );
 	void setParameters( int NUM_RING_, int NUM_SECTOR_, float MAX_RADIUS_,
                      	    float SEARCH_RATIO_, int NUM_EXCLUDE_RECENT_,
      			    int TREE_MAKING_PERIOD_, int NUM_CANDIDATES_FROM_TREE_,
         		    double SC_DIST_THRES_  );
 
-private:	
-	myVectors ringKeysMat;	
-
-	std::vector<Eigen::MatrixXf> ringKeys;  
-	std::vector<Eigen::MatrixXf> sectorKeys;  	
-	std::vector<Eigen::MatrixXf> scanContexts;	
-
+private:
+	myVectors ringKeysMat;
+	std::vector<Eigen::MatrixXf> ringKeys;
+	std::vector<Eigen::MatrixXf> sectorKeys;
+	std::vector<Eigen::MatrixXf> scanContexts;
 	std::unique_ptr<myKDTree> kdTree;
 
 	/*const int NUM_RING = 20;
@@ -554,16 +590,17 @@ const std::pair<int, float> ScanContext<T, Dimension>::detectLoopClosureID()
 
      	// 3. loop threshold check
     	if( min_dist < SC_DIST_THRES ){
-        	loop_id = nn_idx; 
-		
-		std::cerr<<"---------------------------------------------------------------------------"<<std::endl;
- 		std::cerr<<"------------------------------- LOOP FOUND --------------------------------"<<std::endl;
-		std::cerr<<"---------------------------------------------------------------------------"<<std::endl;		
+        	loop_id = nn_idx;
 
-        	// std::cout.precision(3); 
+			std::cout << "---------------------------------------------------------------------------" << std::endl;
+			std::cout << "------------------------------- LOOP FOUND --------------------------------" << std::endl;
+			std::cout << "---------------------------------------------------------------------------" << std::endl;
+
+			// std::cout.precision(3); 
         	std::cout << "[Loop found] Nearest distance: " << min_dist << " between " << scanContexts.size()-1 << " and " << nn_idx << "." << std::endl;
         	std::cout << "[Loop found] yaw diff: " << nn_align * UNIT_SECTOR_ANGLE << " deg." << std::endl;
 		std::cout << "--------------------------------- END ----------------------------------"<<std::endl;
+
     	}
  /*   	else{
         	std::cout.precision(3); 
@@ -577,6 +614,93 @@ const std::pair<int, float> ScanContext<T, Dimension>::detectLoopClosureID()
 
     	return result;
 }
+
+template <typename T, int Dimension>
+void ScanContext<T, Dimension>::detectScancontextID( yaw_dist_id &yaw_dist_id_)
+{
+	int loop_id = -1;
+	// auto curr_ring_key = ringKeys.back(); // current observation
+	Eigen::Matrix<float, Dimension, 1> curr_ring_key = ringKeys.back();
+	auto curr_desc = scanContexts.back();
+	ringKeys.pop_back();
+	scanContexts.pop_back();
+
+	// 1. candidates from ringkey tree_
+	if (ringKeys.size() < NUM_EXCLUDE_RECENT + 1){
+		yaw_dist_id_ = yaw_dist_id{  0.0f, 0.0f, loop_id };
+		return;
+	}
+
+	// 2. kd tree construction
+	if (tree_making_period_conter % TREE_MAKING_PERIOD == 0){
+		std::cout << " ========================= ReConstruct the KD Tree  ======================" << std::endl;
+		ringKeysMat.clear(); // samples
+		ringKeysMat.assign(ringKeys.begin(), ringKeys.end() - NUM_EXCLUDE_RECENT);
+
+		kdTree.reset();
+		kdTree = std::make_unique<myKDTree>(Dimension, ringKeysMat, 10);
+		std::cout << " ========================= Reconstruct the kd tree ======================" << std::endl;
+	}
+	tree_making_period_conter += 1;
+
+#ifdef TERMINAL_LOG
+	std::cout << "Tree Making Period Counter : " << tree_making_period_conter << std::endl;
+#endif
+
+	float min_dist = 10000000; // init with somthing large
+	int nn_align = 0;
+	int nn_idx = 0;
+
+	// knn search
+	std::vector<size_t> candidate_indexes(NUM_CANDIDATES_FROM_TREE);
+	std::vector<float> out_dists_sqr(NUM_CANDIDATES_FROM_TREE);
+
+	nanoflann::KNNResultSet<float> knnsearch_result(NUM_CANDIDATES_FROM_TREE);
+	knnsearch_result.init(&candidate_indexes[0], &out_dists_sqr[0]);
+	kdTree->index->findNeighbors(knnsearch_result, &curr_ring_key[0], nanoflann::SearchParams(10));
+
+	// 2.  pairwise distance (find optimal columnwise best-fit using cosine distance)
+	for (int candidate_iter_idx = 0; candidate_iter_idx < NUM_CANDIDATES_FROM_TREE; candidate_iter_idx++){
+		Eigen::MatrixXf context_candidate = scanContexts[candidate_indexes[candidate_iter_idx]];
+
+		std::pair<float, int> sc_dist_result = distanceBetweenScancontexts(curr_desc, context_candidate);
+
+		float candidate_dist = sc_dist_result.first;
+		int candidate_align = sc_dist_result.second;
+
+		if (candidate_dist < min_dist){
+			min_dist = candidate_dist;
+			nn_align = candidate_align;
+
+			nn_idx = candidate_indexes[candidate_iter_idx];
+		}
+	}
+
+	// 3. loop threshold check
+	if (min_dist < SC_DIST_THRES){
+		loop_id = nn_idx;
+
+		std::cout << "---------------------------------------------------------------------------" << std::endl;
+		std::cout << "------------------------------- LOOP FOUND --------------------------------" << std::endl;
+		std::cout << "---------------------------------------------------------------------------" << std::endl;
+
+		// std::cout.precision(3);
+		std::cout << "[Loop found] Nearest distance: " << min_dist << " between " << scanContexts.size() - 1 << " and " << nn_idx << "." << std::endl;
+		std::cout << "[Loop found] yaw diff: " << nn_align * UNIT_SECTOR_ANGLE << " deg." << std::endl;
+		std::cout << "--------------------------------- END ----------------------------------" << std::endl;
+	}
+	/*   	else{
+			   std::cout.precision(3);
+			   std::cout << "[Not loop] Nearest distance: " << min_dist << " btn " << scanContexts.size()-1 << " and " << nn_idx << "." << std::endl;
+			   std::cout << "[Not loop] yaw diff: " << nn_align * UNIT_SECTOR_ANGLE << " deg." << std::endl;
+		   }
+   */
+	// To do: return also nn_align (i.e., yaw diff)
+	float yaw_diff_rad = deg2rad<float>(nn_align * UNIT_SECTOR_ANGLE);
+	yaw_dist_id_ = {yaw_diff_rad, min_dist, loop_id};
+
+}
+
 
 template<typename T, int Dimension>
 void ScanContext<T, Dimension>::displayAScancontext( const Eigen::MatrixXf &desc ) const
@@ -679,6 +803,7 @@ const int ScanContext<T, Dimension>::getScanContextsSize() const
 {
 	return scanContexts.size();
 }
+
 
 template<typename T, int Dimension>
 void ScanContext<T, Dimension>::drawABin(cv::Mat &image,  int ring_idx, const int sctor_idx)

@@ -21,9 +21,11 @@ public:
 	virtual void setPose( const Eigen::Vector3f &pose );
 
 	virtual int detectedALoop() const;
-private:
-	ICP icp;	
 
+	virtual bool saveScanContext(const std::string &filename, const std::vector<Eigen::Vector3f> &keyPoses);
+
+private:
+	ICP icp;
 	ScanContext<float, 20> scanContext;
 	std::vector<slam::sensor::LaserScan> scanVec;
 	

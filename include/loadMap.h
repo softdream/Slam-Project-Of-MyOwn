@@ -20,7 +20,7 @@ public:
 
 private:
 	bool openMapFile( const std::string &fileName );
-        void closeMapFile();
+    void closeMapFile();
 
 	void loadMap();
 	

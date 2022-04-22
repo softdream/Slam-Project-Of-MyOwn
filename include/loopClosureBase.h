@@ -27,7 +27,9 @@ public:
 	
 	virtual void setPose( const Eigen::Vector3f &pose ) = 0;
 
-	virtual int detectedALoop() const = 0; 
+	virtual int detectedALoop() const = 0;
+
+	virtual bool saveScanContext(const std::string &filename, const std::vector<Eigen::Vector3f> &keyPoses) = 0;
 };
 
 }

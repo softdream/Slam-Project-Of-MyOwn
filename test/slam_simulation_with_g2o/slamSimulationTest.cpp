@@ -7,6 +7,11 @@
 
 #include <unistd.h>
 
+#include <fstream>
+
+#include "saveMap.h"
+
+
 void laserData2Container( const slam::sensor::LaserScan &scan, slam::ScanContainer &container )
 {
         size_t size = 1440;
@@ -64,7 +69,7 @@ int main()
 	cv::imshow("map", image);
 	
 	// open the simulation file
-	std::string file_name = "../../../../simulation_file/laser_data.txt";
+	std::string file_name = "../../../../simulation_file/laser_data2.txt";
 	simulation.openSimulationFile( file_name );
 
 	// convarince
@@ -211,6 +216,13 @@ int main()
 		cv::waitKey(5);	
 	}
 		
+//        std::string map_name = "test1.map";
+//        slam::SaveMap()(map_name, slam.getOccupiedMap());
+	slam.saveMap( "test1.map" );
+
+	//loopDetect->saveScanContext( "scanContext_data.txt", keyPoses );
+        cv::waitKey(0);
+
 
 	// close the simulation file
 	simulation.closeSimulationFile();

@@ -1,5 +1,5 @@
 #include "slamProcessor.h"
-
+#include <fstream>
 
 namespace slam {
 
@@ -237,15 +237,15 @@ void SlamProcessor::displayMap( cv::Mat &image )
                         
 #ifdef TERMINAL_LOG
 			        std::cout<<"Free Point: ( "<<i<<", "<<j<<" )"<<std::endl;
-                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+					std::cout << "prob: " << occupiedGridMap->getCellOccupiedProbability(i, j) << std::endl;
 #endif
                         }
                         else if( occupiedGridMap->isCellOccupied( i, j ) ){
                                 occupiedCount ++;
 #ifdef TERMINAL_LOG
 	                        std::cout<<"Occupied Point: ( "<<i<<", "<<j<<" )"<<std::endl;
-                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
-                                std::cout<<"log Odds value: "<<occumap.getCellLogOdds(i, j)<<std::endl;
+                                std::cout<<"prob: "<<occupiedGridMap->getCellOccupiedProbability( i, j )<<std::endl;
+                                std::cout<<"log Odds value: "<<occupiedGridMap->getCellLogOdds(i, j)<<std::endl;
 #endif
 				cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), -1);
                         }
@@ -344,15 +344,15 @@ void SlamProcessor::displayMap( cv::Mat &image, const std::vector<Eigen::Vector3
 
 #ifdef TERMINAL_LOG
                                 std::cout<<"Free Point: ( "<<i<<", "<<j<<" )"<<std::endl;
-                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
+                                std::cout<<"prob: "<<occupiedGridMap->getCellOccupiedProbability( i, j )<<std::endl;
 #endif
                         }
                         else if( occupiedGridMap->isCellOccupied( i, j ) ){
                                 occupiedCount ++;
 #ifdef TERMINAL_LOG
                                 std::cout<<"Occupied Point: ( "<<i<<", "<<j<<" )"<<std::endl;
-                                std::cout<<"prob: "<<occumap.getCellOccupiedProbability( i, j )<<std::endl;
-                                std::cout<<"log Odds value: "<<occumap.getCellLogOdds(i, j)<<std::endl;
+                                std::cout<<"prob: "<<occupiedGridMap->getCellOccupiedProbability( i, j )<<std::endl;
+                                std::cout<<"log Odds value: "<<occupiedGridMap->getCellLogOdds(i, j)<<std::endl;
 #endif
                                 cv::circle(image, cv::Point2d(i, j), 1, cv::Scalar(0, 0, 255), -1);
                         }
@@ -414,6 +414,55 @@ void SlamProcessor::saveMapAsBMP( const std::string &fileName )
 	std::cout<<"Save the Map to The BMP file ..."<<std::endl;
 }
 
+bool SlamProcessor::saveMap( const std::string &fileName )
+{
+	std::ofstream outfile;
+	outfile.open( fileName, std::ios::binary | std::ios::out );
+	if( !outfile.is_open() ){
+		std::cerr<<"can not open map file !"<<std::endl;
+		return false;
+	}
+
+	// 1. first write the map information
+	int sizeX = occupiedGridMap->getSizeX();
+	int sizeY = occupiedGridMap->getSizeY();
+	Eigen::Vector2i center = occupiedGridMap->getMapCenter();
+
+	int centerX = center[0];
+	int centerY = center[1];
+
+	float cellLength = occupiedGridMap->getCellLength();
+        float scale = occupiedGridMap->getScale();
+
+	// cells' number
+        int cellsNumber = occupiedGridMap->getCellsNumber();
+
+        outfile.write( reinterpret_cast<char *>( &sizeX ), sizeof( sizeX ) );
+        outfile.write( reinterpret_cast<char *>( &sizeY ), sizeof( sizeY ) );
+        outfile.write( reinterpret_cast<char *>( &centerX ), sizeof( centerX ) );
+        outfile.write( reinterpret_cast<char *>( &centerY ), sizeof( centerY ) );
+        outfile.write( reinterpret_cast<char *>( &cellLength ), sizeof( cellLength ) );
+        outfile.write( reinterpret_cast<char *>( &scale ), sizeof( scale ) );
+        outfile.write( reinterpret_cast<char *>( &cellsNumber ), sizeof( cellsNumber ) );
+
+	// 2. write the GridCell Operations information
+        float logOddsPocc = occupiedGridMap->getLogOddsPoccValue();
+        float logOddsPfree = occupiedGridMap->getLogOddsPfreeValue();
+
+        outfile.write( reinterpret_cast<char *>( &logOddsPocc ), sizeof( logOddsPocc ));
+        outfile.write( reinterpret_cast<char *>( &logOddsPfree ), sizeof( logOddsPfree ) );
+
+	// 3. write the Occupied Grid Map information
+
+        // 4. write the GridCell information, it is a std::vector
+        std::vector<GridCell> mapArray = occupiedGridMap->getMapArray();
+
+        outfile.write( reinterpret_cast<char *>( mapArray.data() ), mapArray.size() * sizeof( GridCell ) );
+
+	outfile.close();
+
+	return true;
+}
 
 
 } // end of namespace slam
