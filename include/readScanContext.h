@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include <cassert>
+
 namespace localization{
 
 class ReadScanContext

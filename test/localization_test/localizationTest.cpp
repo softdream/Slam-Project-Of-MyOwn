@@ -12,7 +12,6 @@
 
 #include <unistd.h>
 #include "loadMap.h"
-#include "localization.h"
 #include "slamProcessor.h"
 
 
